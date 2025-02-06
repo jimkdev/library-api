@@ -1,0 +1,40 @@
+{
+  "name": "bookstore-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node --loader=ts-node/esm --watch app.ts",
+    "build": "npx tsc -p tsconfig.json",
+    "start": "node dist/app.js",
+    "format": "npx prettier src/ --write",
+    "lint": "npx eslint src/",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^22.13.1",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "globals": "^15.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "3.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.23.0"
+  },
+  "dependencies": {
+    "fastify": "^5.2.1"
+  },
+  "lint-staged": {
+    "**/*": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+}
