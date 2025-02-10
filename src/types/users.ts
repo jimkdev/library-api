@@ -7,6 +7,17 @@ export type UserRegistrationRequestBody = {
   mobile: string;
 };
 
+export type UserLoginRequestBody = {
+  username: string;
+  password: string;
+};
+
 export type User = {
   id: string;
+  username: string;
+  password?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  mobile: string;
 };
