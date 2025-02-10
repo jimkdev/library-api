@@ -2,12 +2,19 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import { UserRegistrationRequestBody } from "../types/users.js";
+import jwt from "jsonwebtoken";
+
+import {
+  User,
+  UserLoginRequestBody,
+  UserRegistrationRequestBody,
+} from "../types/users.js";
 import {
   findUserByEmail,
   findUserByPhoneNumber,
   findUserByUsername,
 } from "../middleware/users.js";
+import AppConfig from "../config.js";
 
 export default fp(function (
   app: FastifyInstance,
@@ -19,7 +26,87 @@ export default fp(function (
   app.route({
     method: "POST",
     url: `${baseUrl}/login`,
-    handler: async function (req: FastifyRequest, res: FastifyReply) {},
+    handler: async function (req: FastifyRequest, rep: FastifyReply) {
+      const { username, password } = req.body as UserLoginRequestBody;
+
+      const queryResponse = await this.database.query(
+        `SELECT u.id, u.username, u.password, u.first_name, u.last_name, u.email, u.mobile, u.role FROM users u WHERE username = $1`,
+        [`${username.trim()}`],
+      );
+
+      const user = queryResponse.rows[0] as User;
+
+      if (!user) {
+        return rep
+          .code(404)
+          .type("application/json")
+          .send(
+            JSON.stringify({
+              code: 404,
+              status: "Not found",
+              message: "User not found!",
+            }),
+          );
+      }
+
+      if (
+        !user.password ||
+        !(user.password && (await bcrypt.compare(password, user.password)))
+      ) {
+        return rep
+          .code(400)
+          .type("application/json")
+          .send(
+            JSON.stringify({
+              code: 400,
+              status: "Bad request",
+              message: "Invalid username or password!",
+            }),
+          );
+      }
+
+      // Return user without password field
+      const response: User = {
+        id: user.id,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        mobile: user.mobile,
+      };
+
+      const config = AppConfig.getInstance();
+
+      const accessToken = jwt.sign(
+        { userId: user.id },
+        config.getJwtAccessTokenSecret(),
+        {
+          expiresIn: config.getJwtExpirationTime(),
+        },
+      );
+
+      const refreshToken = jwt.sign(
+        { userId: user.id },
+        config.getJwtRefreshTokenSecret(),
+      );
+
+      rep
+        .code(200)
+        .type("application/json")
+        .send(
+          JSON.stringify({
+            code: 200,
+            status: "Ok",
+            data: {
+              accessToken,
+              refreshToken,
+              user: {
+                ...response,
+              },
+            },
+          }),
+        );
+    },
   });
 
   app.route({
