@@ -26,6 +26,58 @@ export default fp(function (
   app.route({
     method: "POST",
     url: `${baseUrl}/login`,
+    schema: {
+      body: {
+        type: "object",
+        properties: {
+          username: { type: "string" },
+          password: { type: "string" },
+        },
+      },
+      response: {
+        400: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        404: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        200: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            data: {
+              type: "object",
+              properties: {
+                accessToken: { type: "string" },
+                refreshToken: { type: "string" },
+                user: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    username: { type: "string" },
+                    first_name: { type: "string" },
+                    last_name: { type: "string" },
+                    email: { type: "string" },
+                    mobile: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     handler: async function (req: FastifyRequest, rep: FastifyReply) {
       const { username, password } = req.body as UserLoginRequestBody;
 
@@ -113,6 +165,19 @@ export default fp(function (
     method: "POST",
     url: `${baseUrl}/register`,
     preHandler: [findUserByUsername, findUserByEmail, findUserByPhoneNumber],
+    schema: {
+      body: {
+        type: "object",
+        properties: {
+          username: { type: "string" },
+          password: { type: "string" },
+          first_name: { type: "string" },
+          last_name: { type: "string" },
+          email: { type: "string" },
+          mobile: { type: "string" },
+        },
+      },
+    },
     handler: async function (req: FastifyRequest, rep: FastifyReply) {
       try {
         const { username, password, first_name, last_name, email, mobile } =
