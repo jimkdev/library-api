@@ -1,4 +1,4 @@
-import fastify from "fastify";
+import fastify, { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import dotenv from "dotenv";
 import pg from "pg";
@@ -21,6 +21,16 @@ const config = AppConfig.getInstance();
 app.register(cors);
 app.register(database);
 app.register(userRoutes);
+
+app.setErrorHandler(function (
+  error: FastifyError,
+  req: FastifyRequest,
+  rep: FastifyReply,
+) {
+  console.log(error);
+
+  rep.type("application/json").send(error);
+});
 
 app.listen({ host: config.getHost(), port: config.getPort() }, () => {
   console.log(`App is running on port ${config.getPort()}`);
