@@ -29,20 +29,21 @@ export default fp(function (
     schema: {
       body: {
         type: "object",
+        required: ["username", "password"],
         properties: {
           username: { type: "string" },
           password: { type: "string" },
         },
       },
       response: {
-        400: {
-          type: "object",
-          properties: {
-            code: { type: "number" },
-            status: { type: "string" },
-            message: { type: "string" },
-          },
-        },
+        // 400: {
+        //   type: "object",
+        //   properties: {
+        //     code: { type: "number" },
+        //     status: { type: "string" },
+        //     message: { type: "string" },
+        //   },
+        // },
         404: {
           type: "object",
           properties: {
@@ -168,6 +169,14 @@ export default fp(function (
     schema: {
       body: {
         type: "object",
+        required: [
+          "username",
+          "password",
+          "first_name",
+          "last_name",
+          "email",
+          "mobile",
+        ],
         properties: {
           username: { type: "string" },
           password: { type: "string" },
