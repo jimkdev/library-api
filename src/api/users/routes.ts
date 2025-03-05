@@ -8,13 +8,13 @@ import {
   User,
   UserLoginRequestBody,
   UserRegistrationRequestBody,
-} from "../types/users.js";
+} from "../../types/users.js";
 import {
   findUserByEmail,
   findUserByPhoneNumber,
   findUserByUsername,
-} from "../middleware/users.js";
-import AppConfig from "../config.js";
+} from "../../middleware/users.js";
+import AppConfig from "../../config.js";
 
 export default fp(function (
   app: FastifyInstance,
