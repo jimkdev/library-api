@@ -38,14 +38,14 @@ DB={"host":"","port":5432,"database":"","user":"","password":""}
 ```
 
 ### How to run the project in development mode
-Please run the following commands in your terminal:
+In order to run your app in development mode, you need to run the following commands in your terminal:
 1. ```npm install```
 2. ```npm run dev```
 
 ### How to build and run the project in production mode
-Please run the following commands in your terminal:
+In order to run your app in production mode, you need to run the following commands in your terminal:
 1. ```npm install``` if haven't already run it
 2. ```npm run build``` in order to compile the typescript code and generate the required **.js** files
 3. ```npm start```
 
-The generated files after you run ```npm run build``` are located inside the **dist/** directory.
+The generated files after you run ```npm run build``` are located inside the **dist** directory.
