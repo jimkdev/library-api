@@ -5,6 +5,7 @@ import pg from "pg";
 
 import AppConfig from "./config.js";
 import userRoutes from "./api/users/routes.js";
+import bookRoutes from "./api/books/routes.js";
 import database from "./database/pool.js";
 
 dotenv.config();
@@ -21,6 +22,7 @@ const config = AppConfig.getInstance();
 app.register(cors);
 app.register(database);
 app.register(userRoutes);
+app.register(bookRoutes);
 
 app.setErrorHandler(function (
   error: FastifyError,
