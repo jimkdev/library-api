@@ -2,6 +2,8 @@ import fp from "fastify-plugin";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { v4 as uuidv4 } from "uuid";
 
+import { isAuthorized } from "../../middleware/auth.js";
+
 type Book = {
   id?: string;
   title: string;
@@ -17,6 +19,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
   app.route({
     url: `${baseUrl}/add`,
     method: "POST",
+    preHandler: [isAuthorized],
     handler: async function (req: FastifyRequest, rep: FastifyReply) {
       try {
         const books: Book[] = req.body as Book[];
