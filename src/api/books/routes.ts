@@ -18,24 +18,43 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     url: `${baseUrl}/add`,
     method: "POST",
     handler: async function (req: FastifyRequest, rep: FastifyReply) {
-      // TODO find a better implementation solution
-      // Finish implementation
-
       try {
         const books: Book[] = req.body as Book[];
 
-        const values = books
+        // Create parameter positions
+        const parameterPositions = books
           .map(
             (book, index) =>
-              `('${uuidv4()}', '${book.title}', '${book.author}', '${book.isbn}', '${book.publishedAt}', ${book.quantity > 0 ? true : false}, ${book.quantity})${index === books.length - 1 ? "" : ","}`,
+              `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${index * 7 + 4}, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`,
           )
-          .reduce((a, b) => a + b);
+          .join(", ");
 
+        // Create parameterized query
         const query = `
           INSERT INTO books (id, title, author, isbn, published_at, is_available, quantity)
-          VALUES ${values};
+          VALUES ${parameterPositions};
         `;
-        await this.database.query(query);
+
+        // Format values
+        const values = books.flatMap((book) => [
+          uuidv4(),
+          book.title,
+          book.author,
+          book.isbn,
+          book.publishedAt,
+          book.quantity > 0 ? true : false,
+          book.quantity,
+        ]);
+
+        await this.database.query(query, values);
+
+        const response = {
+          code: 201,
+          status: "Created",
+          message: "Book(s) have been created!",
+        };
+
+        rep.type("application/json").code(201).send(JSON.stringify(response));
       } catch (error) {
         console.log(error);
         rep
