@@ -28,7 +28,6 @@ export function isAuthorized(
 
   try {
     jwt.verify(token, config.getJwtAccessTokenSecret());
-    next();
   } catch (error) {
     rep
       .code(401)
@@ -41,4 +40,6 @@ export function isAuthorized(
         }),
       );
   }
+
+  next();
 }
