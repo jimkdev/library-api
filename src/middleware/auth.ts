@@ -29,6 +29,7 @@ export function isAuthorized(
   try {
     jwt.verify(token, config.getJwtAccessTokenSecret());
   } catch (error) {
+    console.log(error);
     rep
       .code(401)
       .type("application/json")

@@ -143,6 +143,22 @@ export default fp(function (
         config.getJwtRefreshTokenSecret(),
       );
 
+      await this.database.query(
+        `
+          UPDATE refresh_tokens SET is_revoked = TRUE
+          WHERE is_revoked = $1
+          AND is_expired = $2
+          AND user_id = $3
+        `,
+        [false, false, user.id],
+      );
+
+      // TODO set expiration time
+      await this.database.query(
+        `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`,
+        [user.id, refreshToken, "2025-09-05 18:08:00"],
+      );
+
       rep
         .code(200)
         .type("application/json")
@@ -229,6 +245,65 @@ export default fp(function (
               message: "Error on user registration!",
             }),
           );
+      }
+    },
+  });
+
+  app.route({
+    method: "POST",
+    url: `${baseUrl}/refresh`,
+    handler: async function (req: FastifyRequest, rep: FastifyReply) {
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader) {
+        return rep.code(401).type("application/json").send({
+          code: 401,
+          status: "Unauthorized",
+          message: "Unauthorized!",
+        });
+      }
+
+      const config = AppConfig.getInstance();
+
+      const refreshToken = authHeader.split(" ")[1];
+
+      try {
+        const response = await this.database.query(
+          `SELECT rt.is_revoked, rt.is_expired, rt.expires_at FROM refresh_tokens rt WHERE rt.token = $1`,
+          [refreshToken],
+        );
+
+        const tokenData = response.rows[0];
+
+        if (
+          !tokenData ||
+          (tokenData && (tokenData.is_revoked || tokenData.is_expired))
+        ) {
+          return rep.code(401).type("application/json").send({
+            code: 401,
+            status: "Unauthorized",
+            message: "Unauthorized! (Invalid token)",
+          });
+        }
+
+        const decodedToken = jwt.verify(
+          refreshToken,
+          config.getJwtRefreshTokenSecret(),
+        ) as jwt.JwtPayload;
+
+        const accessToken = jwt.sign(
+          { userId: decodedToken.userId },
+          config.getJwtAccessTokenSecret(),
+          {
+            expiresIn: config.getJwtExpirationTime(),
+          },
+        );
+
+        return {
+          accessToken,
+        };
+      } catch (error) {
+        console.log(error);
       }
     },
   });
