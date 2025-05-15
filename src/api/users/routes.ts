@@ -15,6 +15,7 @@ import {
   findUserByUsername,
 } from "../../middleware/users.js";
 import AppConfig from "../../config.js";
+import { DateTime } from "luxon";
 
 export default fp(function (
   app: FastifyInstance,
@@ -153,10 +154,13 @@ export default fp(function (
         [false, false, user.id],
       );
 
-      // TODO set expiration time
       await this.database.query(
         `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`,
-        [user.id, refreshToken, "2025-09-05 18:08:00"],
+        [
+          user.id,
+          refreshToken,
+          DateTime.now().toUTC().plus({ hour: 1 }).toISO(),
+        ],
       );
 
       rep
@@ -269,7 +273,7 @@ export default fp(function (
 
       try {
         const response = await this.database.query(
-          `SELECT rt.is_revoked, rt.is_expired, rt.expires_at FROM refresh_tokens rt WHERE rt.token = $1`,
+          `SELECT rt.id, rt.is_revoked, rt.is_expired, rt.expires_at::text FROM refresh_tokens rt WHERE rt.token = $1`,
           [refreshToken],
         );
 
@@ -283,6 +287,22 @@ export default fp(function (
             code: 401,
             status: "Unauthorized",
             message: "Unauthorized! (Invalid token)",
+          });
+        }
+        const expires_at = DateTime.fromISO(
+          String(tokenData["expires_at"]).replace(" ", "T") + "Z",
+        );
+
+        if (DateTime.utc() >= expires_at.toUTC()) {
+          await this.database.query(
+            `UPDATE refresh_tokens SET is_expired = TRUE WHERE id = $1`,
+            [tokenData["id"]],
+          );
+
+          return rep.code(401).type("application/json").send({
+            code: 401,
+            status: "Unauthorized",
+            message: "Token has expired!",
           });
         }
 
@@ -304,6 +324,7 @@ export default fp(function (
         };
       } catch (error) {
         console.log(error);
+        throw error;
       }
     },
   });
