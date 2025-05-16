@@ -16,6 +16,8 @@ import {
 } from "../../middleware/users.js";
 import AppConfig from "../../config.js";
 import { DateTime } from "luxon";
+import { QueryResult } from "pg";
+import { RefreshTokenData } from "../../types/tokens.js";
 
 export default fp(function (
   app: FastifyInstance,
@@ -272,10 +274,10 @@ export default fp(function (
       const refreshToken = authHeader.split(" ")[1];
 
       try {
-        const response = await this.database.query(
+        const response = (await this.database.query(
           `SELECT rt.id, rt.is_revoked, rt.is_expired, rt.expires_at::text FROM refresh_tokens rt WHERE rt.token = $1`,
           [refreshToken],
-        );
+        )) as QueryResult<RefreshTokenData>;
 
         const tokenData = response.rows[0];
 
