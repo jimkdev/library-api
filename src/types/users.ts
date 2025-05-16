@@ -12,6 +12,10 @@ export type UserLoginRequestBody = {
   password: string;
 };
 
+export type UserLogoutRequestBody = {
+  refreshToken: string;
+};
+
 export type User = {
   id: string;
   username: string;

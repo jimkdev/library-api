@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import {
   User,
   UserLoginRequestBody,
+  UserLogoutRequestBody,
   UserRegistrationRequestBody,
 } from "../../types/users.js";
 import {
@@ -18,6 +19,7 @@ import AppConfig from "../../config.js";
 import { DateTime } from "luxon";
 import { QueryResult } from "pg";
 import { RefreshTokenData } from "../../types/tokens.js";
+import { isAuthorized } from "../../middleware/auth.js";
 
 export default fp(function (
   app: FastifyInstance,
@@ -324,6 +326,56 @@ export default fp(function (
         return {
           accessToken,
         };
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    },
+  });
+
+  app.route({
+    method: "POST",
+    url: `${baseUrl}/logout`,
+    preHandler: [isAuthorized],
+    handler: async function (req: FastifyRequest, rep: FastifyReply) {
+      const { refreshToken } = req.body as UserLogoutRequestBody;
+
+      if (!refreshToken || refreshToken === "") {
+        return rep.code(400).type("application/json").send({
+          code: 400,
+          status: "Bad request",
+          message: "Missing refreshToken!",
+        });
+      }
+
+      try {
+        const response = (await this.database.query(
+          `SELECT rt.id, rt.is_revoked FROM refresh_tokens rt WHERE rt.token = $1`,
+          [refreshToken],
+        )) as QueryResult<RefreshTokenData>;
+
+        const tokenData = response.rows[0];
+
+        if (tokenData && tokenData.is_revoked) {
+          return rep.code(400).type("application/json").send({
+            code: 400,
+            status: "Bad request",
+            message: "User is not signed in!",
+          });
+        }
+
+        await this.database.query(
+          `UPDATE refresh_tokens SET is_revoked = TRUE
+           WHERE token = $1
+          `,
+          [refreshToken],
+        );
+
+        rep.code(200).type("application/json").send({
+          code: 200,
+          status: "OK",
+          message: "User has been signed out!",
+        });
       } catch (error) {
         console.log(error);
         throw error;
