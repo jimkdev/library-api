@@ -25,6 +25,57 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     url: `${baseUrl}/add`,
     method: "POST",
     preHandler: [isAuthorized],
+    schema: {
+      body: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["title", "author", "isbn", "publishedAt", "quantity"],
+          properties: {
+            title: { type: "string" },
+            author: { type: "string" },
+            isbn: { type: "string" },
+            publishedAt: { type: "string" },
+            quantity: { type: "number" },
+          },
+        },
+      },
+      response: {
+        201: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        400: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number" },
+            code: { type: "string" },
+            error: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        401: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        500: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+    },
     handler: async function (req: FastifyRequest, rep: FastifyReply) {
       try {
         const books: Book[] = req.body as Book[];
@@ -72,7 +123,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
             JSON.stringify({
               code: 500,
               status: "Internal server error",
-              message: "Book could not be stored!",
+              message: "Book(s) could not be stored!",
             }),
           );
       }
@@ -83,6 +134,77 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     url: `${baseUrl}`,
     method: "GET",
     preHandler: [isAuthorized],
+    schema: {
+      querystring: {
+        type: "object",
+        required: ["page", "limit"],
+        properties: {
+          page: { type: "number" },
+          limit: { type: "string" },
+        },
+      },
+      response: {
+        400: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number" },
+            code: { type: "string" },
+            error: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        200: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            data: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "number" },
+                  title: { type: "string" },
+                  author: { type: "string" },
+                  isbn: { type: "string" },
+                  published_at: { type: "string" },
+                  is_available: { type: "boolean" },
+                  quantity: { type: "number" },
+                },
+              },
+            },
+            pagination: {
+              type: "object",
+              properties: {
+                totalRecords: { type: "number" },
+                currentPage: { type: "number" },
+                limit: { type: "number" },
+                totalPages: { type: "number" },
+                nextPage: { type: "number" },
+                prevPage: { type: "number" },
+              },
+            },
+            message: { type: "string" },
+          },
+        },
+        401: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        500: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+    },
     handler: async function (req: FastifyRequest, rep: FastifyReply) {
       try {
         let { page, limit } = req.query as PaginationParams;
@@ -126,6 +248,8 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
         result = await this.database.query(query, [offset, limit]);
 
         const response = {
+          code: 200,
+          status: "OK",
           data: [...result.rows],
           pagination: {
             totalRecords: result.rowCount,
@@ -135,6 +259,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
             nextPage: nextPage,
             prevPage: prevPage,
           },
+          message: "Books have been retrieved!",
         };
         rep.code(200).type("application/json").send(JSON.stringify(response));
       } catch (error) {
