@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { User, UserRegistrationRequestBody } from "../types/users.js";
+
+import { User, UserRegistrationRequestBody } from "./users.types.js";
 
 export async function findUserByUsername(
   this: FastifyInstance,

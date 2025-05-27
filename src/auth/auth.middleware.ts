@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
+
 import AppConfig from "../config.js";
 
 export function isAuthorized(

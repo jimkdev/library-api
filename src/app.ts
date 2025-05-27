@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import pg from "pg";
 
 import AppConfig from "./config.js";
-import userRoutes from "./api/users/routes.js";
-import bookRoutes from "./api/books/routes.js";
+import userRoutes from "./users/users.routes.js";
+import bookRoutes from "./books/books.routes.js";
 import database from "./database/pool.js";
 
 dotenv.config();

@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import pg from "pg";
+
 import AppConfig from "../config.js";
 
 export default fp(function (
