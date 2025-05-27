@@ -34,6 +34,46 @@ app.setErrorHandler(function (
   rep.type("application/json").send(error);
 });
 
+await app.register(import("@fastify/swagger"), {
+  openapi: {
+    openapi: "3.0.0",
+    info: {
+      title: "API documentation",
+      description: "API documentation",
+      version: "0.1.0",
+    },
+    servers: [
+      {
+        url: `http://localhost:${config.getPort()}`,
+        description: "Development server",
+      },
+    ],
+  },
+});
+
+await app.register(import("@fastify/swagger-ui"), {
+  routePrefix: "/docs",
+  uiConfig: {
+    docExpansion: "none",
+    deepLinking: false,
+  },
+  uiHooks: {
+    onRequest: function (req, rep, next) {
+      next();
+    },
+    preHandler: function (req, rep, next) {
+      next();
+    },
+  },
+  staticCSP: true,
+  transformStaticCSP: (header) => header,
+  transformSpecification: (swaggerObject) => swaggerObject,
+  transformSpecificationClone: true,
+});
+
+await app.ready();
+app.swagger();
+
 app.listen({ host: config.getHost(), port: config.getPort() }, () => {
   console.log(`App is running on port ${config.getPort()}`);
 });
