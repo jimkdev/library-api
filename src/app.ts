@@ -33,6 +33,10 @@ await app.register(import("@fastify/swagger"), {
         description: "Development server",
       },
     ],
+    tags: [
+      { name: "users", description: "User related endpoints" },
+      { name: "books", description: "Book related endpoints" },
+    ],
   },
 });
 

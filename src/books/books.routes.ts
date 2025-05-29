@@ -12,6 +12,8 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     method: "POST",
     preHandler: [isAuthorized],
     schema: {
+      description: "Add books",
+      tags: ["books"],
       body: {
         type: "array",
         items: {
@@ -70,6 +72,8 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     method: "GET",
     preHandler: [isAuthorized],
     schema: {
+      description: "Get books",
+      tags: ["books"],
       querystring: {
         type: "object",
         required: ["page", "limit"],

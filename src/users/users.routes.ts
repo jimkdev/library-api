@@ -21,6 +21,8 @@ export default fp(function (
     method: "POST",
     url: `${baseUrl}/login`,
     schema: {
+      description: "User login",
+      tags: ["users"],
       body: {
         type: "object",
         required: ["username", "password"],
@@ -83,6 +85,8 @@ export default fp(function (
     url: `${baseUrl}/register`,
     preHandler: [findUserByUsername, findUserByEmail, findUserByPhoneNumber],
     schema: {
+      description: "User registration",
+      tags: ["users"],
       body: {
         type: "object",
         required: [
@@ -136,6 +140,8 @@ export default fp(function (
     method: "POST",
     url: `${baseUrl}/refresh`,
     schema: {
+      description: "Refresh token",
+      tags: ["users"],
       headers: {
         type: "object",
         required: ["authorization"],
@@ -176,6 +182,8 @@ export default fp(function (
     url: `${baseUrl}/logout`,
     preHandler: [isAuthorized],
     schema: {
+      description: "User logout",
+      tags: ["users"],
       headers: {
         type: "object",
         required: ["authorization"],
