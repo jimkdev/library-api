@@ -19,21 +19,6 @@ declare module "fastify" {
 const app = fastify();
 const config = AppConfig.getInstance();
 
-app.register(cors);
-app.register(database);
-app.register(userRoutes);
-app.register(bookRoutes);
-
-app.setErrorHandler(function (
-  error: FastifyError,
-  req: FastifyRequest,
-  rep: FastifyReply,
-) {
-  console.log(error);
-
-  rep.type("application/json").send(error);
-});
-
 await app.register(import("@fastify/swagger"), {
   openapi: {
     openapi: "3.0.0",
@@ -54,7 +39,7 @@ await app.register(import("@fastify/swagger"), {
 await app.register(import("@fastify/swagger-ui"), {
   routePrefix: "/docs",
   uiConfig: {
-    docExpansion: "none",
+    docExpansion: "list",
     deepLinking: false,
   },
   uiHooks: {
@@ -67,8 +52,25 @@ await app.register(import("@fastify/swagger-ui"), {
   },
   staticCSP: true,
   transformStaticCSP: (header) => header,
-  transformSpecification: (swaggerObject) => swaggerObject,
+  // transformSpecification: (swaggerObject, req, res) => {
+  //   return swaggerObject;
+  // },
   transformSpecificationClone: true,
+});
+
+app.register(cors);
+app.register(database);
+app.register(userRoutes);
+app.register(bookRoutes);
+
+app.setErrorHandler(function (
+  error: FastifyError,
+  req: FastifyRequest,
+  rep: FastifyReply,
+) {
+  console.log(error);
+
+  rep.type("application/json").send(error);
 });
 
 await app.ready();
