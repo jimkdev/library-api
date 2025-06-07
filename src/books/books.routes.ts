@@ -2,7 +2,7 @@ import fp from "fastify-plugin";
 import { FastifyInstance } from "fastify";
 
 import { isAuthorized } from "../auth/auth.middleware.js";
-import { addBooks, getBooks } from "./books.controllers.js";
+import { addBooks, getBook, getBooks } from "./books.controllers.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/books";
@@ -145,6 +145,71 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
       },
     },
     handler: getBooks,
+  });
+
+  app.route({
+    url: `${baseUrl}/:id`,
+    method: "GET",
+    preHandler: [isAuthorized],
+    schema: {
+      description: "Get book",
+      tags: ["books"],
+      params: {
+        type: "object",
+        required: ["id"],
+        properties: {
+          id: { type: "string" },
+        },
+      },
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+            data: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                title: { type: "string" },
+                author: { type: "string" },
+                isbn: { type: "string" },
+                published_at: { type: "string" },
+                is_available: { type: "number" },
+                quantity: { type: "number" },
+              },
+            },
+          },
+        },
+        400: {
+          type: "object",
+          properties: {
+            statusCode: { type: "number" },
+            code: { type: "string" },
+            error: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        401: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        500: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+    },
+    handler: getBook,
   });
 
   done();

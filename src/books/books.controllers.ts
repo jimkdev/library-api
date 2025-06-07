@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { PaginationParams } from "../utils/pagination/pagination.types.js";
 
-import { Book } from "./books.types.js";
+import { Book, GetBookParams } from "./books.types.js";
 
 export async function addBooks(
   this: FastifyInstance,
@@ -135,5 +135,54 @@ export async function getBooks(
           message: "Could not fetch books!",
         }),
       );
+  }
+}
+
+export async function getBook(
+  this: FastifyInstance,
+  req: FastifyRequest,
+  rep: FastifyReply,
+) {
+  const { id } = req.params as GetBookParams;
+
+  if (!id || id === "") {
+    return rep
+      .code(400)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 400,
+          status: "Bad request!",
+          message: "Invalid id!",
+        }),
+      );
+  }
+
+  try {
+    const result = await this.database.query(
+      `
+      SELECT b.id, b.title, b.author, b.isbn, b.published_at, b.is_available, b.quantity FROM books b
+      WHERE id = $1;
+    `,
+      [id],
+    );
+
+    rep
+      .code(200)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 200,
+          status: "OK",
+          data: { ...result.rows[0] },
+        }),
+      );
+  } catch (error) {
+    console.log(error);
+    return rep.code(500).type("application/json").send({
+      code: 500,
+      status: "Internal Server Error",
+      message: "An unexpected error occured!",
+    });
   }
 }

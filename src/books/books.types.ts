@@ -6,3 +6,7 @@ export type Book = {
   publishedAt: Date;
   quantity: number;
 };
+
+export type GetBookParams = {
+  id: string;
+};
