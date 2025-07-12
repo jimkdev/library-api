@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import AppConfig from "../config.js";
 
@@ -28,7 +28,11 @@ export function isAuthorized(
   }
 
   try {
-    jwt.verify(token, config.getJwtAccessTokenSecret());
+    const data = jwt.verify(
+      token,
+      config.getJwtAccessTokenSecret(),
+    ) as JwtPayload;
+    this.user = data.userId;
   } catch (error) {
     console.log(error);
     rep

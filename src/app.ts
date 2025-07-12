@@ -7,12 +7,15 @@ import AppConfig from "./config.js";
 import userRoutes from "./users/users.routes.js";
 import bookRoutes from "./books/books.routes.js";
 import database from "./database/pool.js";
+import bookLendingsRoutes from "./book-lendings/book-lendings.routes.js";
+import userDecorators from "./users/users.decorators.js";
 
 dotenv.config();
 
 declare module "fastify" {
   interface FastifyInstance {
     database: pg.Pool;
+    user: string | null;
   }
 }
 
@@ -64,8 +67,10 @@ await app.register(import("@fastify/swagger-ui"), {
 
 app.register(cors);
 app.register(database);
+app.register(userDecorators);
 app.register(userRoutes);
 app.register(bookRoutes);
+app.register(bookLendingsRoutes);
 
 app.setErrorHandler(function (
   error: FastifyError,

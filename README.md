@@ -44,8 +44,8 @@ In order to run your app in development mode, you need to run the following comm
 
 ### How to build and run the project in production mode
 In order to run your app in production mode, you need to run the following commands in your terminal:
-1. ```npm install``` if haven't already run it
+1. ```npm install``` if you haven't already run it
 2. ```npm run build``` in order to compile the typescript code and generate the required **.js** files
-3. ```npm start```
+3. ```npm start``` to start the app
 
 The generated files after you run ```npm run build``` are located inside the **dist** directory.
