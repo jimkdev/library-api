@@ -3,7 +3,7 @@ import { FastifyInstance } from "fastify";
 
 import { isAuthorized } from "../auth/auth.middleware.js";
 
-import { lendBook, extendReturnDate } from "./book-lendings.controllers.js";
+import { extendReturnDate, lendBook } from "./book-lendings.controllers.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/books/lendings";

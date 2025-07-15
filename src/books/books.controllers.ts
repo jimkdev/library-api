@@ -23,9 +23,9 @@ export async function addBooks(
 
     // Create parameterized query
     const query = `
-          INSERT INTO books (id, title, author, isbn, published_at, is_available, quantity)
-          VALUES ${parameterPositions};
-        `;
+        INSERT INTO books (id, title, author, isbn, published_at, is_available, quantity)
+        VALUES ${parameterPositions};
+    `;
 
     // Format values
     const values = books.flatMap((book) => [
@@ -77,7 +77,8 @@ export async function getBooks(
 
     const offset = limit * (page - 1);
 
-    let query = `SELECT COUNT(b.id) AS count FROM books b`;
+    let query = `SELECT COUNT(b.id) AS count
+                 FROM books b`;
 
     let result = (await this.database.query(query)).rows[0];
 
@@ -101,10 +102,16 @@ export async function getBooks(
     const prevPage = page <= 1 ? null : page - 1;
 
     query = `
-          SELECT b.id, b.title, b.author, b.isbn, b.published_at,
-          b.is_available, b.quantity FROM books b
-          OFFSET $1 LIMIT $2;
-        `;
+        SELECT b.id,
+               b.title,
+               b.author,
+               b.isbn,
+               b.published_at,
+               b.is_available,
+               b.quantity
+        FROM books b
+        OFFSET $1 LIMIT $2;
+    `;
 
     result = await this.database.query(query, [offset, limit]);
 
@@ -161,9 +168,10 @@ export async function getBook(
   try {
     const result = await this.database.query(
       `
-      SELECT b.id, b.title, b.author, b.isbn, b.published_at, b.is_available, b.quantity FROM books b
-      WHERE id = $1;
-    `,
+          SELECT b.id, b.title, b.author, b.isbn, b.published_at, b.is_available, b.quantity
+          FROM books b
+          WHERE id = $1;
+      `,
       [id],
     );
 
