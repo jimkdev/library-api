@@ -33,7 +33,7 @@ await app.register(import("@fastify/swagger"), {
     servers: [
       {
         url: `http://localhost:${config.getPort()}`,
-        description: "Development server",
+        description: "Local development server",
       },
     ],
     tags: [
