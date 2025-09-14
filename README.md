@@ -14,8 +14,8 @@
 
 This API is made as a personal project in order to better understand **Fastify**, **NodeJS**, **Typescript** and *
 *PostgreSQL**. With this API, the client will be able to manage books, rentals and the users of the library. For the
-authentication, it uses **JSON web tokens**. For the validation of the input **JSON-Schema** is being used. Moreover, *
-*Luxon** is used for date-time formatting. While it tries to be a simple project, the goal is to make it as secure as
+authentication, it uses **JSON web tokens**. For the validation of the input **JSON-Schema** is being used. Moreover,
+**Luxon** is used for date-time formatting. While it tries to be a simple project, the goal is to make it as secure as
 possible, use design patterns wherever possible and trying to follow best practices.
 
 ## Installation and usage
