@@ -9,6 +9,7 @@
     - [Configuration](#configuration)
     - [How to run the project in development mode](#how-to-run-the-project-in-development-mode)
     - [How to build and run the project in production mode](#how-to-build-and-run-the-project-in-production-mode)
+- [Database schema](#database-schema)
 
 ## About the project
 
@@ -65,3 +66,66 @@ In order to run your app in production mode, you need to run the following comma
 3. ```npm start``` to start the app
 
 The generated files after you run ```npm run build``` are located inside the **dist** directory.
+
+## Database schema
+The database schema is created using **[dbdiagram](https://dbdiagram.io/home)**.
+Documentation for dbdiagram can be found **[here](https://dbml.dbdiagram.io/docs)**.
+
+### DBDiagram code
+```text
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+    id         UUID         [PRIMARY KEY]
+    username   VARCHAR(20)  [UNIQUE, NOT NULL]
+    password   VARCHAR(255) [NOT NULL]
+    first_name VARCHAR(40)  [NOT NULL]
+    last_name  VARCHAR(40)  [NOT NULL]
+    email      VARCHAR(40)  [UNIQUE, NOT NULL]
+    mobile     VARCHAR(14)  [UNIQUE, NOT NULL]
+    role       roles        [NOT NULL, DEFAULT: 'user']
+    created_at TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+    updated_at TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+}
+
+Table books {
+  id UUID [PRIMARY KEY]
+  title        VARCHAR(100) [NOT NULL]
+  author       VARCHAR(100) [NOT NULL]
+  ISBN         VARCHAR(17)  [NOT NULL, UNIQUE]
+  published_at DATE
+  is_available BOOLEAN      [NOT NULL, DEFAULT: FALSE]
+  quantity     INT          [NOT NULL, DEFAULT: 0]
+  created_at   TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+  updated_at   TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+}
+
+Table book_lendings {
+  id             SERIAL    [PRIMARY KEY]
+  user_id        UUID      [NOT NULL]
+  book_id        UUID      [NOT NULL]
+  lent_at        TIMESTAMP [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+  returned_at    TIMESTAMP
+  date_of_return DATE      [NOT NULL]
+  date_extended  BOOLEAN   [DEFAULT: FALSE]
+}
+
+Table refresh_tokens {
+  id         SERIAL [PRIMARY KEY]
+  user_id    UUID         [NOT NULL]
+  token      VARCHAR(255) [NOT NULL]
+  is_revoked BOOLEAN      [NOT NULL, DEFAULT: FALSE]
+  is_expired BOOLEAN      [NOT NULL, DEFAULT: FALSE]
+  expires_at TIMESTAMP    [NOT NULL]
+  created_at TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+  updated_at TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
+}
+
+Ref: book_lendings.user_id > users.id
+Ref: book_lendings.book_id - books.id
+```
+
+### ER Diagram
+Below, you can find the ER diagram for the database.
+![er-diagram](documentation-assets/er-diagram.PNG)
