@@ -102,8 +102,8 @@ export default fp(function (
           password: { type: "string" },
           first_name: { type: "string" },
           last_name: { type: "string" },
-          email: { type: "string" },
-          mobile: { type: "string" },
+          email: { type: "string", format: "email" },
+          mobile: { type: "string", pattern: "^(?:\\+30)69\\d{8}$" },
         },
       },
       response: {
