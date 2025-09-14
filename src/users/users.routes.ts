@@ -98,8 +98,8 @@ export default fp(function (
           "mobile",
         ],
         properties: {
-          username: { type: "string" },
-          password: { type: "string" },
+          username: { type: "string", minLength: 8 },
+          password: { type: "string", minLength: 8 },
           first_name: { type: "string" },
           last_name: { type: "string" },
           email: { type: "string", format: "email" },
