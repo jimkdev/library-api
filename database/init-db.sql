@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens
     token      VARCHAR(255) NOT NULL,
     is_revoked BOOLEAN      NOT NULL DEFAULT FALSE,
     is_expired BOOLEAN      NOT NULL DEFAULT FALSE,
-    expired_at TIMESTAMP    NOT NULL,
+    expires_at TIMESTAMP    NOT NULL,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
