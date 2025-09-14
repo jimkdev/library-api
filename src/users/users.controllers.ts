@@ -127,7 +127,7 @@ export async function register(
   rep: FastifyReply,
 ) {
   try {
-    const { username, password, first_name, last_name, email, mobile } =
+    const { username, password, firstName, lastName, email, mobile } =
       req.body as UserRegistrationRequestBody;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -138,8 +138,8 @@ export async function register(
         uuidv4(),
         username.trim(),
         hashedPassword,
-        first_name.trim(),
-        last_name.trim(),
+        firstName.trim(),
+        lastName.trim(),
         email.trim(),
         mobile.trim(),
       ],
