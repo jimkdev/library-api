@@ -16,16 +16,13 @@ export async function lendBook(
     const { bookId } = req.body as CreateBookLendingDto;
 
     if (!bookId) {
-      return rep
-        .code(200)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 400,
-            status: "Bad request",
-            message: "Invalid book id!",
-          }),
-        );
+      return rep.code(200).send(
+        JSON.stringify({
+          code: 400,
+          status: "Bad request",
+          message: "Invalid book id!",
+        }),
+      );
     }
 
     try {
@@ -43,16 +40,13 @@ export async function lendBook(
     }
   } catch (error) {
     console.log(error);
-    return rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "An unexpected error has occured!",
-        }),
-      );
+    return rep.code(500).send(
+      JSON.stringify({
+        code: 500,
+        status: "Internal server error",
+        message: "An unexpected error has occured!",
+      }),
+    );
   }
 }
 
@@ -102,16 +96,13 @@ export async function extendReturnDate(
     const data = response.rows[0];
 
     if (data.date_extended) {
-      return rep
-        .code(200)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 200,
-            status: "OK",
-            message: "You have already extended the return period!",
-          }),
-        );
+      return rep.code(200).send(
+        JSON.stringify({
+          code: 200,
+          status: "OK",
+          message: "You have already extended the return period!",
+        }),
+      );
     }
 
     const newDate = DateTime.fromJSDate(new Date(data.date_of_return)).plus({

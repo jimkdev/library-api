@@ -259,7 +259,7 @@ export async function logout(
   const { refreshToken } = req.body as UserLogoutRequestBody;
 
   if (!refreshToken || refreshToken === "") {
-    return rep.code(400).type("application/json").send({
+    return rep.code(400).send({
       code: 400,
       status: "Bad request",
       message: "Missing refreshToken!",
@@ -275,7 +275,7 @@ export async function logout(
     const tokenData = response.rows[0];
 
     if (tokenData && tokenData.is_revoked) {
-      return rep.code(400).type("application/json").send({
+      return rep.code(400).send({
         code: 400,
         status: "Bad request",
         message: "User is not signed in!",
@@ -289,7 +289,7 @@ export async function logout(
       [refreshToken],
     );
 
-    rep.code(200).type("application/json").send({
+    rep.code(200).send({
       code: 200,
       status: "OK",
       message: "User has been signed out!",

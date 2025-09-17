@@ -46,7 +46,7 @@ export async function addBooks(
       message: "Book(s) have been created!",
     };
 
-    rep.type("application/json").code(201).send(JSON.stringify(response));
+    rep.code(201).send(JSON.stringify(response));
   } catch (error) {
     console.log(error);
     rep
@@ -85,17 +85,14 @@ export async function getBooks(
     const totalPages = limit > 0 ? Math.ceil(result["count"] / limit) : 1;
 
     if (page > totalPages) {
-      return rep
-        .code(400)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 400,
-            status: "Bad request",
-            message:
-              "Current page number cannot be greater than total pages number!",
-          }),
-        );
+      return rep.code(400).send(
+        JSON.stringify({
+          code: 400,
+          status: "Bad request",
+          message:
+            "Current page number cannot be greater than total pages number!",
+        }),
+      );
     }
 
     const nextPage = page >= totalPages ? null : page + 1;
@@ -132,16 +129,13 @@ export async function getBooks(
     rep.code(200).type("application/json").send(JSON.stringify(response));
   } catch (error) {
     console.error(error);
-    rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "Could not fetch books!",
-        }),
-      );
+    rep.code(500).send(
+      JSON.stringify({
+        code: 500,
+        status: "Internal server error",
+        message: "Could not fetch books!",
+      }),
+    );
   }
 }
 
@@ -153,16 +147,13 @@ export async function getBook(
   const { id } = req.params as GetBookParams;
 
   if (!id || id === "") {
-    return rep
-      .code(400)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 400,
-          status: "Bad request!",
-          message: "Invalid id!",
-        }),
-      );
+    return rep.code(400).send(
+      JSON.stringify({
+        code: 400,
+        status: "Bad request!",
+        message: "Invalid id!",
+      }),
+    );
   }
 
   try {
@@ -175,19 +166,16 @@ export async function getBook(
       [id],
     );
 
-    rep
-      .code(200)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 200,
-          status: "OK",
-          data: { ...result.rows[0] },
-        }),
-      );
+    rep.code(200).send(
+      JSON.stringify({
+        code: 200,
+        status: "OK",
+        data: { ...result.rows[0] },
+      }),
+    );
   } catch (error) {
     console.log(error);
-    return rep.code(500).type("application/json").send({
+    return rep.code(500).send({
       code: 500,
       status: "Internal Server Error",
       message: "An unexpected error occured!",
