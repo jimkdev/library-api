@@ -59,16 +59,6 @@ export async function login(
         );
     }
 
-    // Return user without password field
-    const response: User = {
-      id: user.id,
-      username: user.username,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      mobile: user.mobile,
-    };
-
     const config = AppConfig.getInstance();
 
     const accessToken = jwt.sign(
@@ -96,22 +86,25 @@ export async function login(
 
     await this.database.query(
       `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`,
-      [user.id, refreshToken, DateTime.now().toUTC().plus({ hour: 1 }).toISO()],
+      [user.id, refreshToken, DateTime.now().toUTC().plus({ days: 7 }).toISO()],
     );
 
     rep
       .code(200)
       .type("application/json")
+      .setCookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: config.getIsProductionEnvironment(),
+        sameSite: "strict",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+      })
       .send(
         JSON.stringify({
           code: 200,
           status: "Ok",
           data: {
             accessToken,
-            refreshToken,
-            user: {
-              ...response,
-            },
           },
         }),
       );
