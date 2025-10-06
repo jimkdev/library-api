@@ -1,5 +1,6 @@
 import fastify, { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
 import dotenv from "dotenv";
 import pg from "pg";
 
@@ -76,6 +77,7 @@ await app.register(import("@fastify/swagger-ui"), {
 });
 
 app.register(cors);
+app.register(cookie);
 app.register(database);
 app.register(userDecorators);
 app.register(userRoutes);
