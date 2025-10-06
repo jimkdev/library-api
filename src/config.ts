@@ -14,6 +14,7 @@ export default class AppConfig {
 
   private readonly host: string;
   private readonly port: number;
+  private readonly isProductionEnvironment: boolean;
   private readonly dbSettings: DatabaseSettings;
   private readonly jwtExpirationTime: StringValue;
   private readonly jwtAccessTokenSecret: string;
@@ -22,6 +23,7 @@ export default class AppConfig {
   private constructor() {
     this.host = process.env.HOST!;
     this.port = Number.parseInt(process.env.PORT!);
+    this.isProductionEnvironment = process.env.NODE_ENV === "production";
     this.dbSettings = JSON.parse(process.env.DB ?? "{}");
     this.jwtExpirationTime = "1H";
     this.jwtAccessTokenSecret = process.env.ACCESS_TOKEN_SECRET!;
@@ -42,6 +44,10 @@ export default class AppConfig {
 
   public getPort() {
     return this.port;
+  }
+
+  public isProductionEnvironment(): boolean {
+    return this.isProductionEnvironment;
   }
 
   public getDatabaseSettings() {
