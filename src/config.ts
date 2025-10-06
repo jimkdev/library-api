@@ -46,7 +46,7 @@ export default class AppConfig {
     return this.port;
   }
 
-  public isProductionEnvironment(): boolean {
+  public getIsProductionEnvironment(): boolean {
     return this.isProductionEnvironment;
   }
 
