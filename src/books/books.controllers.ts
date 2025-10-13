@@ -166,13 +166,16 @@ export async function getBook(
       [id],
     );
 
-    rep.code(200).send(
-      JSON.stringify({
-        code: 200,
-        status: "OK",
-        data: { ...result.rows[0] },
-      }),
-    );
+    rep
+      .code(200)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 200,
+          status: "OK",
+          data: { ...result.rows[0] },
+        }),
+      );
   } catch (error) {
     console.log(error);
     return rep.code(500).send({
