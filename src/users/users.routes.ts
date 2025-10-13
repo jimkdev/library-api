@@ -187,13 +187,6 @@ export default fp(function (
           authorization: { type: "string" },
         },
       },
-      body: {
-        type: "object",
-        required: ["refreshToken"],
-        properties: {
-          refreshToken: { type: "string" },
-        },
-      },
       response: {
         400: {
           type: "object",

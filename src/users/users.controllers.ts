@@ -253,7 +253,7 @@ export async function logout(
     return rep.code(400).type("application/json").send({
       code: 400,
       status: "Bad request",
-      message: "Missing refreshToken!",
+      message: "Missing refresh token!",
     });
   }
 
@@ -280,11 +280,22 @@ export async function logout(
       [refreshToken],
     );
 
-    rep.code(200).type("application/json").send({
-      code: 200,
-      status: "OK",
-      message: "User has been signed out!",
-    });
+    const config = AppConfig.getInstance();
+
+    rep
+      .code(200)
+      .type("application/json")
+      .clearCookie("refresh_token", {
+        httpOnly: true,
+        secure: config.getIsProductionEnvironment(),
+        sameSite: "strict",
+        path: "/",
+      })
+      .send({
+        code: 200,
+        status: "OK",
+        message: "User has been signed out!",
+      });
   } catch (error) {
     console.log(error);
     throw error;
