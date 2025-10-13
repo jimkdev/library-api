@@ -25,7 +25,7 @@ export default class AppConfig {
     this.port = Number.parseInt(process.env.PORT!);
     this.isProductionEnvironment = process.env.NODE_ENV === "production";
     this.dbSettings = JSON.parse(process.env.DB ?? "{}");
-    this.jwtExpirationTime = "1H";
+    this.jwtExpirationTime = "10m";
     this.jwtAccessTokenSecret = process.env.ACCESS_TOKEN_SECRET!;
     this.jwtRefreshTokenSecret = process.env.REFRESH_TOKEN_SECRET!;
   }

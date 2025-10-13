@@ -13,8 +13,9 @@ export function isAuthorized(
   const config = AppConfig.getInstance();
 
   const token = authHeader && authHeader.split(" ")[1];
+  const refreshToken = req.cookies["refresh_token"];
 
-  if (!token) {
+  if (!token || token === "" || !refreshToken || refreshToken === "") {
     return rep
       .code(401)
       .type("application/json")
