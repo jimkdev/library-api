@@ -168,9 +168,9 @@ export async function refresh(
   req: FastifyRequest,
   rep: FastifyReply,
 ) {
-  const authHeader = req.headers.authorization;
+  const refreshToken = req.cookies["refresh_token"];
 
-  if (!authHeader) {
+  if (!refreshToken) {
     return rep.code(401).type("application/json").send({
       code: 401,
       status: "Unauthorized",
@@ -179,8 +179,6 @@ export async function refresh(
   }
 
   const config = AppConfig.getInstance();
-
-  const refreshToken = authHeader.split(" ")[1];
 
   try {
     const response = (await this.database.query(
