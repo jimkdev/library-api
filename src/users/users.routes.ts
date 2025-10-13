@@ -144,10 +144,6 @@ export default fp(function (
       tags: ["users"],
       headers: {
         type: "object",
-        required: ["authorization"],
-        properties: {
-          authorization: { type: "string" },
-        },
       },
       response: {
         200: {
