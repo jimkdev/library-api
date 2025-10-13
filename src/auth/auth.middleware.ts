@@ -15,13 +15,16 @@ export function isAuthorized(
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
-    return rep.code(401).send(
-      JSON.stringify({
-        code: 401,
-        status: "Unauthorized",
-        message: "Unauthorized",
-      }),
-    );
+    return rep
+      .code(401)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 401,
+          status: "Unauthorized",
+          message: "Unauthorized",
+        }),
+      );
   }
 
   try {
@@ -32,13 +35,16 @@ export function isAuthorized(
     this.user = data.userId;
   } catch (error) {
     console.log(error);
-    rep.code(401).send(
-      JSON.stringify({
-        code: 401,
-        status: "Unauthorized",
-        message: "Unauthorized",
-      }),
-    );
+    rep
+      .code(401)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 401,
+          status: "Unauthorized",
+          message: "Unauthorized",
+        }),
+      );
   }
 
   next();
