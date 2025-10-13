@@ -247,7 +247,7 @@ export async function logout(
   req: FastifyRequest,
   rep: FastifyReply,
 ) {
-  const { refreshToken } = req.body as UserLogoutRequestBody;
+  const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken || refreshToken === "") {
     return rep.code(400).type("application/json").send({
