@@ -7,6 +7,7 @@ import {
 } from "./book-lendings.types.js";
 import { QueryResult } from "pg";
 import AppConfig from "../config.js";
+import { Book } from "../books/books.types.js";
 
 export async function lendBook(
   this: FastifyInstance,
@@ -28,24 +29,70 @@ export async function lendBook(
       );
     }
 
-    try {
-      await this.database.query("BEGIN;");
+    const bookData = (
       await this.database.query(
         `
-      INSERT INTO book_lendings (user_id, book_id, date_of_return) VALUES ($1, $2, $3);
-    `,
-        [
-          this.user,
-          bookId,
-          DateTime.now()
-            .toUTC()
-            .plus({ day: config.getNumberOfDaysBeforeReturn() }),
-        ],
-      );
-      await this.database.query("COMMIT;");
-    } catch (error) {
-      console.log(error);
-      await this.database.query("ROLLBACK;");
+        SELECT is_available, quantity
+        FROM books
+        WHERE id = $1;
+      `,
+        [bookId],
+      )
+    ).rows[0];
+
+    if (bookData.is_available) {
+      try {
+        await this.database.query("BEGIN;");
+        await this.database.query(
+          `
+          INSERT INTO book_lendings (user_id, book_id, date_of_return) VALUES ($1, $2, $3);
+        `,
+          [
+            this.user,
+            bookId,
+            DateTime.now()
+              .toUTC()
+              .plus({ day: config.getNumberOfDaysBeforeReturn() }),
+          ],
+        );
+
+        const updatedQuantity =
+          bookData.quantity <= 0 ? 0 : bookData.quantity - 1;
+        await this.database.query(
+          `
+          UPDATE books
+          SET quantity = $1
+          WHERE id = $2
+        `,
+          [updatedQuantity, bookId],
+        );
+
+        if (updatedQuantity <= 0) {
+          await this.database.query(
+            `
+            UPDATE books
+            SET is_available = $1
+            WHERE id = $2
+          `,
+            [updatedQuantity > 0, bookId],
+          );
+        }
+        await this.database.query("COMMIT;");
+      } catch (error) {
+        console.log(error);
+        await this.database.query("ROLLBACK;");
+      }
+    } else {
+      rep
+        .code(200)
+        .type("application/json")
+        .send(
+          JSON.stringify({
+            code: 200,
+            status: "OK",
+            message: "Book is not available!",
+          }),
+        );
     }
   } catch (error) {
     console.log(error);
