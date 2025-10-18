@@ -36,7 +36,7 @@ export function isAuthorized(
     this.user = data.userId;
   } catch (error) {
     console.log(error);
-    rep
+    return rep
       .code(401)
       .type("application/json")
       .send(
