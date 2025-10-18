@@ -19,6 +19,7 @@ export default class AppConfig {
   private readonly jwtExpirationTime: StringValue;
   private readonly jwtAccessTokenSecret: string;
   private readonly jwtRefreshTokenSecret: string;
+  private readonly numberOfDaysBeforeReturn: number;
 
   private constructor() {
     this.host = process.env.HOST!;
@@ -28,6 +29,7 @@ export default class AppConfig {
     this.jwtExpirationTime = "10m";
     this.jwtAccessTokenSecret = process.env.ACCESS_TOKEN_SECRET!;
     this.jwtRefreshTokenSecret = process.env.REFRESH_TOKEN_SECRET!;
+    this.numberOfDaysBeforeReturn = 7;
   }
 
   public static getInstance() {
@@ -64,5 +66,9 @@ export default class AppConfig {
 
   public getJwtRefreshTokenSecret(): string {
     return this.jwtRefreshTokenSecret;
+  }
+
+  public getNumberOfDaysBeforeReturn(): number {
+    return this.numberOfDaysBeforeReturn;
   }
 }

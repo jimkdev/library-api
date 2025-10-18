@@ -6,6 +6,7 @@ import {
   ExtendBookLendingReturnDateDto,
 } from "./book-lendings.types.js";
 import { QueryResult } from "pg";
+import AppConfig from "../config.js";
 
 export async function lendBook(
   this: FastifyInstance,
@@ -14,6 +15,8 @@ export async function lendBook(
 ) {
   try {
     const { bookId } = req.body as CreateBookLendingDto;
+
+    const config = AppConfig.getInstance();
 
     if (!bookId) {
       return rep.code(200).send(
@@ -31,7 +34,13 @@ export async function lendBook(
         `
       INSERT INTO book_lendings (user_id, book_id, date_of_return) VALUES ($1, $2, $3);
     `,
-        [this.user, bookId, DateTime.now().toUTC().plus({ day: 7 })],
+        [
+          this.user,
+          bookId,
+          DateTime.now()
+            .toUTC()
+            .plus({ day: config.getNumberOfDaysBeforeReturn() }),
+        ],
       );
       await this.database.query("COMMIT;");
     } catch (error) {
