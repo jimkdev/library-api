@@ -46,7 +46,7 @@ export async function addBooks(
       message: "Book(s) have been created!",
     };
 
-    rep.code(201).send(JSON.stringify(response));
+    rep.code(201).type("application/json").send(JSON.stringify(response));
   } catch (error) {
     console.log(error);
     rep
