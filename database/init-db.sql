@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users
     email      VARCHAR(40) UNIQUE NOT NULL,
     mobile     VARCHAR(14) UNIQUE NOT NULL,
     role       roles              NOT NULL DEFAULT 'user',
+    is_active  BOOLEAN            NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
