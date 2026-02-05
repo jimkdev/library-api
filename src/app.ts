@@ -10,6 +10,7 @@ import bookRoutes from "./books/books.routes.js";
 import database from "./database/pool.js";
 import bookLendingsRoutes from "./book-lendings/book-lendings.routes.js";
 import userDecorators from "./users/users.decorators.js";
+import analyticsRoutes from "./analytics/analytics.routes.js";
 
 dotenv.config();
 
@@ -83,6 +84,7 @@ app.register(userDecorators);
 app.register(userRoutes);
 app.register(bookRoutes);
 app.register(bookLendingsRoutes);
+app.register(analyticsRoutes);
 
 app.addHook("onSend", async (req: FastifyRequest, rep: FastifyReply) => {
   if (!rep.getHeader("Content-Type")) {
