@@ -34,12 +34,7 @@ export default class PaginationService {
 
     if (this.page > totalPages) {
       throw new Error(
-        JSON.stringify({
-          code: 400,
-          status: "Bad request",
-          message:
-            "Current page number cannot be greater than total pages number!",
-        }),
+        "Current page number cannot be greater than total pages number!",
       );
     }
 

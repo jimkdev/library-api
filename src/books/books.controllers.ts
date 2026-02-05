@@ -88,7 +88,7 @@ export async function getBooks(
     try {
       paginationDetails = paginationService.paginate(result["count"] as never);
     } catch (error) {
-      console.log(JSON.parse(error as string));
+      console.log(error);
       return rep.code(400).send(error);
     }
 
@@ -126,13 +126,16 @@ export async function getBooks(
     rep.code(200).type("application/json").send(JSON.stringify(response));
   } catch (error) {
     console.error(error);
-    rep.code(500).send(
-      JSON.stringify({
-        code: 500,
-        status: "Internal server error",
-        message: "Could not fetch books!",
-      }),
-    );
+    rep
+      .code(500)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 500,
+          status: "Internal server error",
+          message: "Could not fetch books!",
+        }),
+      );
   }
 }
 
