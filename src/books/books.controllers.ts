@@ -1,7 +1,11 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { v4 as uuidv4 } from "uuid";
 
-import { PaginationParams } from "../utils/pagination/pagination.types.js";
+import {
+  PaginationDetails,
+  PaginationParams,
+} from "../utils/pagination/pagination.types.js";
+import PaginationService from "../utils/pagination/pagination.service.js";
 
 import { Book, GetBookParams } from "./books.types.js";
 
@@ -68,35 +72,25 @@ export async function getBooks(
   rep: FastifyReply,
 ) {
   try {
-    let { page, limit } = req.query as PaginationParams;
+    const { page, limit } = req.query as PaginationParams;
 
-    // TODO Separate pagination logic
-
-    page = Number.parseInt(page.toString());
-    limit = Number.parseInt(limit.toString());
-
-    const offset = limit * (page - 1);
+    const paginationService = PaginationService.initialize(
+      Number.parseInt(page.toString()),
+      Number.parseInt(limit.toString()),
+    );
 
     let query = `SELECT COUNT(b.id) AS count
                  FROM books b`;
 
     let result = (await this.database.query(query)).rows[0];
 
-    const totalPages = limit > 0 ? Math.ceil(result["count"] / limit) : 1;
-
-    if (page > totalPages) {
-      return rep.code(400).send(
-        JSON.stringify({
-          code: 400,
-          status: "Bad request",
-          message:
-            "Current page number cannot be greater than total pages number!",
-        }),
-      );
+    let paginationDetails: PaginationDetails | undefined;
+    try {
+      paginationDetails = paginationService.paginate(result["count"] as never);
+    } catch (error) {
+      console.log(JSON.parse(error as string));
+      return rep.code(400).send(error);
     }
-
-    const nextPage = page >= totalPages ? null : page + 1;
-    const prevPage = page <= 1 ? null : page - 1;
 
     query = `
         SELECT b.id,
@@ -110,7 +104,10 @@ export async function getBooks(
         OFFSET $1 LIMIT $2;
     `;
 
-    result = await this.database.query(query, [offset, limit]);
+    result = await this.database.query(query, [
+      paginationDetails.offset,
+      paginationService.getLimit(),
+    ]);
 
     const response = {
       code: 200,
@@ -118,11 +115,11 @@ export async function getBooks(
       data: [...result.rows],
       pagination: {
         totalRecords: result.rowCount,
-        currentPage: page,
-        limit: limit,
-        totalPages: totalPages,
-        nextPage: nextPage,
-        prevPage: prevPage,
+        currentPage: paginationService.getCurrentPage(),
+        limit: paginationService.getLimit(),
+        totalPages: paginationDetails.totalPages,
+        nextPage: paginationDetails.nextPage,
+        prevPage: paginationDetails.previousPage,
       },
       message: "Books have been retrieved!",
     };
