@@ -2,7 +2,12 @@ import fp from "fastify-plugin";
 import { FastifyInstance } from "fastify";
 
 import { isAuthorized } from "../auth/auth.middleware.js";
-import { addBooks, getBook, getBooks } from "./books.controllers.js";
+import {
+  addBooks,
+  getBook,
+  getBooks,
+  removeBooks,
+} from "./books.controllers.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/books";
@@ -210,6 +215,56 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
       },
     },
     handler: getBook,
+  });
+
+  app.route({
+    url: `${baseUrl}/remove`,
+    method: "DELETE",
+    preHandler: [isAuthorized],
+    schema: {
+      description: "Remove books",
+      tags: ["books"],
+      querystring: {
+        type: "object",
+        required: ["ids"],
+        properties: {
+          ids: { type: "string" },
+        },
+      },
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+            data: {
+              type: "object",
+              properties: {
+                rowsAffected: { type: "number" },
+              },
+            },
+          },
+        },
+        400: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+        500: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+    },
+    handler: removeBooks,
   });
 
   done();

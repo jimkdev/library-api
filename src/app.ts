@@ -51,6 +51,8 @@ await app.register(import("@fastify/swagger"), {
     tags: [
       { name: "users", description: "User related endpoints" },
       { name: "books", description: "Book related endpoints" },
+      { name: "book-lendings", description: "Book lendings related endpoints" },
+      { name: "analytics", description: "Analytics related endpoints" },
     ],
   },
 });

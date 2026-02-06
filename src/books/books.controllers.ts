@@ -181,7 +181,84 @@ export async function getBook(
     return rep.code(500).send({
       code: 500,
       status: "Internal Server Error",
-      message: "An unexpected error occured!",
+      message: "An unexpected error occurred!",
+    });
+  }
+}
+
+export async function removeBooks(
+  this: FastifyInstance,
+  req: FastifyRequest,
+  rep: FastifyReply,
+) {
+  try {
+    const { ids } = req.query as { ids: string };
+    const separators: string[] = [",", "?", ":", ":", ";"];
+
+    const separator = separators.find((separator) => ids.includes(separator));
+
+    if (!separator) {
+      return rep
+        .code(400)
+        .type("application/json")
+        .send(
+          JSON.stringify({
+            code: 400,
+            status: "Bad request",
+            message: "Invalid separator!",
+          }),
+        );
+    }
+
+    const bookIds: string[] = ids
+      .split(separator)
+      .map((id) => id.trim())
+      .filter((id) => id !== "");
+
+    const queryParams = bookIds.map(
+      (bookId: string, index: number) => `$${index + 1}`,
+    );
+
+    if (queryParams.length === 0) {
+      return rep
+        .code(400)
+        .type("application/json")
+        .send(
+          JSON.stringify({
+            code: 400,
+            status: "Bad request",
+            message: "Missing query params!",
+          }),
+        );
+    }
+
+    const rowsAffected: number =
+      (
+        await this.database.query(
+          `
+      DELETE FROM books WHERE id IN (${queryParams});
+    `,
+          [...bookIds],
+        )
+      ).rowCount ?? 0;
+
+    rep
+      .code(200)
+      .type("application/json")
+      .send(
+        JSON.stringify({
+          code: 200,
+          status: "OK",
+          message: "Books have been removed successfully!",
+          data: { rowsAffected },
+        }),
+      );
+  } catch (error) {
+    console.error(error);
+    return rep.code(500).send({
+      code: 500,
+      status: "Internal Server Error",
+      message: "An unexpected error occurred!",
     });
   }
 }
