@@ -11,7 +11,6 @@ import { RefreshTokenData } from "../auth/auth.types.js";
 import {
   User,
   UserLoginRequestBody,
-  UserLogoutRequestBody,
   UserRegistrationRequestBody,
 } from "./users.types.js";
 
@@ -31,32 +30,22 @@ export async function login(
     const user = queryResponse.rows[0] as User;
 
     if (!user) {
-      return rep
-        .code(404)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 404,
-            status: "Not found",
-            message: "User not found!",
-          }),
-        );
+      return rep.code(404).send({
+        code: 404,
+        status: "Not found",
+        message: "User not found!",
+      });
     }
 
     if (
       !user.password ||
       !(user.password && (await bcrypt.compare(password, user.password)))
     ) {
-      return rep
-        .code(400)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 400,
-            status: "Bad request",
-            message: "Invalid password!",
-          }),
-        );
+      return rep.code(400).send({
+        code: 400,
+        status: "Bad request",
+        message: "Invalid password!",
+      });
     }
 
     const config = AppConfig.getInstance();
@@ -91,7 +80,6 @@ export async function login(
 
     rep
       .code(200)
-      .type("application/json")
       .setCookie("refresh_token", refreshToken, {
         httpOnly: true,
         secure: config.getIsProductionEnvironment(),
@@ -99,15 +87,13 @@ export async function login(
         path: "/",
         maxAge: 7 * 24 * 60 * 60, // 7 days
       })
-      .send(
-        JSON.stringify({
-          code: 200,
-          status: "Ok",
-          data: {
-            accessToken,
-          },
-        }),
-      );
+      .send({
+        code: 200,
+        status: "Ok",
+        data: {
+          accessToken,
+        },
+      });
   } catch (error) {
     console.log(error);
     throw error;
@@ -138,28 +124,18 @@ export async function register(
       ],
     );
 
-    rep
-      .code(201)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 201,
-          status: "Created",
-          message: "User has been registered successfully!",
-        }),
-      );
+    rep.code(201).send({
+      code: 201,
+      status: "Created",
+      message: "User has been registered successfully!",
+    });
   } catch (error) {
     console.log(error);
-    rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "Error on user registration!",
-        }),
-      );
+    rep.code(500).send({
+      code: 500,
+      status: "Internal server error",
+      message: "Error on user registration!",
+    });
   }
 }
 
@@ -171,7 +147,7 @@ export async function refresh(
   const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken) {
-    return rep.code(401).type("application/json").send({
+    return rep.code(401).send({
       code: 401,
       status: "Unauthorized",
       message: "Unauthorized!",
@@ -192,7 +168,7 @@ export async function refresh(
       !tokenData ||
       (tokenData && (tokenData.is_revoked || tokenData.is_expired))
     ) {
-      return rep.code(401).type("application/json").send({
+      return rep.code(401).send({
         code: 401,
         status: "Unauthorized",
         message: "Unauthorized! (Invalid token)",
@@ -208,7 +184,7 @@ export async function refresh(
         [tokenData["id"]],
       );
 
-      return rep.code(401).type("application/json").send({
+      return rep.code(401).send({
         code: 401,
         status: "Unauthorized",
         message: "Token has expired!",
@@ -228,7 +204,7 @@ export async function refresh(
       },
     );
 
-    rep.code(200).type("application/json").send({
+    rep.code(200).send({
       code: 200,
       status: "OK",
       data: {
@@ -250,7 +226,7 @@ export async function logout(
   const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken || refreshToken === "") {
-    return rep.code(400).type("application/json").send({
+    return rep.code(400).send({
       code: 400,
       status: "Bad request",
       message: "Missing refresh token!",
@@ -266,7 +242,7 @@ export async function logout(
     const tokenData = response.rows[0];
 
     if (tokenData && tokenData.is_revoked) {
-      return rep.code(400).type("application/json").send({
+      return rep.code(400).send({
         code: 400,
         status: "Bad request",
         message: "User is not signed in!",
@@ -284,7 +260,6 @@ export async function logout(
 
     rep
       .code(200)
-      .type("application/json")
       .clearCookie("refresh_token", {
         httpOnly: true,
         secure: config.getIsProductionEnvironment(),

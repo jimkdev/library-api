@@ -20,13 +20,11 @@ export async function lendBook(
     const config = AppConfig.getInstance();
 
     if (!bookId) {
-      return rep.code(200).send(
-        JSON.stringify({
-          code: 400,
-          status: "Bad request",
-          message: "Invalid book id!",
-        }),
-      );
+      return rep.code(200).send({
+        code: 400,
+        status: "Bad request",
+        message: "Invalid book id!",
+      });
     }
 
     const bookData = (
@@ -83,29 +81,19 @@ export async function lendBook(
         await this.database.query("ROLLBACK;");
       }
     } else {
-      rep
-        .code(200)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 200,
-            status: "OK",
-            message: "Book is not available!",
-          }),
-        );
+      rep.code(200).send({
+        code: 200,
+        status: "OK",
+        message: "Book is not available!",
+      });
     }
   } catch (error) {
     console.log(error);
-    return rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "An unexpected error has occurred!",
-        }),
-      );
+    return rep.code(500).send({
+      code: 500,
+      status: "Internal server error",
+      message: "An unexpected error has occurred!",
+    });
   }
 }
 
@@ -157,29 +145,19 @@ export async function extendReturnDate(
     const data = response.rows[0];
 
     if (!data) {
-      return rep
-        .code(404)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 404,
-            status: "Not found",
-            message: "Book not found!",
-          }),
-        );
+      return rep.code(404).send({
+        code: 404,
+        status: "Not found",
+        message: "Book not found!",
+      });
     }
 
     if (data.date_extended) {
-      return rep
-        .code(200)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 200,
-            status: "OK",
-            message: "You have already extended the return period!",
-          }),
-        );
+      return rep.code(200).send({
+        code: 200,
+        status: "OK",
+        message: "You have already extended the return period!",
+      });
     }
 
     if (
@@ -187,17 +165,11 @@ export async function extendReturnDate(
         (validExtensionDay) => validExtensionDay === extensionDays,
       )
     ) {
-      return rep
-        .code(400)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 400,
-            status: "Bad request",
-            message:
-              "Extension days number is not in available extension days!",
-          }),
-        );
+      return rep.code(400).send({
+        code: 400,
+        status: "Bad request",
+        message: "Extension days number is not in available extension days!",
+      });
     }
 
     const newDate = DateTime.fromJSDate(new Date(data.date_of_return)).plus({
@@ -215,15 +187,10 @@ export async function extendReturnDate(
     console.log(error);
     await this.database.query("ROLLBACK;");
 
-    rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "An unexpected error has occurred!",
-        }),
-      );
+    rep.code(500).send({
+      code: 500,
+      status: "Internal server error",
+      message: "An unexpected error has occurred!",
+    });
   }
 }

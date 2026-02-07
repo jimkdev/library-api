@@ -50,19 +50,14 @@ export async function addBooks(
       message: "Book(s) have been created!",
     };
 
-    rep.code(201).type("application/json").send(JSON.stringify(response));
+    rep.code(201).send(response);
   } catch (error) {
     console.log(error);
-    rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "Book(s) could not be stored!",
-        }),
-      );
+    rep.code(500).send({
+      code: 500,
+      status: "Internal server error",
+      message: "Book(s) could not be stored!",
+    });
   }
 }
 
@@ -123,19 +118,14 @@ export async function getBooks(
       },
       message: "Books have been retrieved!",
     };
-    rep.code(200).type("application/json").send(JSON.stringify(response));
+    rep.code(200).send(response);
   } catch (error) {
     console.error(error);
-    rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "Could not fetch books!",
-        }),
-      );
+    rep.code(500).send({
+      code: 500,
+      status: "Internal server error",
+      message: "Could not fetch books!",
+    });
   }
 }
 
@@ -147,13 +137,11 @@ export async function getBook(
   const { id } = req.params as GetBookParams;
 
   if (!id || id === "") {
-    return rep.code(400).send(
-      JSON.stringify({
-        code: 400,
-        status: "Bad request!",
-        message: "Invalid id!",
-      }),
-    );
+    return rep.code(400).send({
+      code: 400,
+      status: "Bad request!",
+      message: "Invalid id!",
+    });
   }
 
   try {
@@ -166,16 +154,11 @@ export async function getBook(
       [id],
     );
 
-    rep
-      .code(200)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 200,
-          status: "OK",
-          data: { ...result.rows[0] },
-        }),
-      );
+    rep.code(200).send({
+      code: 200,
+      status: "OK",
+      data: { ...result.rows[0] },
+    });
   } catch (error) {
     console.log(error);
     return rep.code(500).send({
@@ -198,16 +181,11 @@ export async function removeBooks(
     const separator = separators.find((separator) => ids.includes(separator));
 
     if (!separator) {
-      return rep
-        .code(400)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 400,
-            status: "Bad request",
-            message: "Invalid separator!",
-          }),
-        );
+      return rep.code(400).send({
+        code: 400,
+        status: "Bad request",
+        message: "Invalid separator!",
+      });
     }
 
     const bookIds: string[] = ids
@@ -220,16 +198,11 @@ export async function removeBooks(
     );
 
     if (queryParams.length === 0) {
-      return rep
-        .code(400)
-        .type("application/json")
-        .send(
-          JSON.stringify({
-            code: 400,
-            status: "Bad request",
-            message: "Missing query params!",
-          }),
-        );
+      return rep.code(400).send({
+        code: 400,
+        status: "Bad request",
+        message: "Missing query params!",
+      });
     }
 
     const rowsAffected: number =
@@ -242,17 +215,12 @@ export async function removeBooks(
         )
       ).rowCount ?? 0;
 
-    rep
-      .code(200)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 200,
-          status: "OK",
-          message: "Books have been removed successfully!",
-          data: { rowsAffected },
-        }),
-      );
+    rep.code(200).send({
+      code: 200,
+      status: "OK",
+      message: "Books have been removed successfully!",
+      data: { rowsAffected },
+    });
   } catch (error) {
     console.error(error);
     return rep.code(500).send({

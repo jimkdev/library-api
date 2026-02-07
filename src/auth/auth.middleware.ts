@@ -16,16 +16,11 @@ export function isAuthorized(
   const refreshToken = req.cookies["refresh_token"];
 
   if (!token || token === "" || !refreshToken || refreshToken === "") {
-    return rep
-      .code(401)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 401,
-          status: "Unauthorized",
-          message: "Unauthorized",
-        }),
-      );
+    return rep.code(401).send({
+      code: 401,
+      status: "Unauthorized",
+      message: "Unauthorized",
+    });
   }
 
   try {
@@ -36,16 +31,11 @@ export function isAuthorized(
     this.user = data.userId;
   } catch (error) {
     console.log(error);
-    return rep
-      .code(401)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 401,
-          status: "Unauthorized",
-          message: "Unauthorized",
-        }),
-      );
+    return rep.code(401).send({
+      code: 401,
+      status: "Unauthorized",
+      message: "Unauthorized",
+    });
   }
 
   next();

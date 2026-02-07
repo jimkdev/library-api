@@ -27,31 +27,21 @@ export async function getAnalytics(
   `)
     ).rows[0] as Analytics;
 
-    rep
-      .code(200)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 200,
-          status: "OK",
-          data: {
-            totalBookLendings: analytics["total_book_lendings"],
-            totalActiveUsers: analytics["total_active_users"],
-            totalAvailableBooks: analytics["total_available_books"],
-          },
-        }),
-      );
+    rep.code(200).send({
+      code: 200,
+      status: "OK",
+      data: {
+        totalBookLendings: analytics["total_book_lendings"],
+        totalActiveUsers: analytics["total_active_users"],
+        totalAvailableBooks: analytics["total_available_books"],
+      },
+    });
   } catch (error) {
     console.log(error);
-    return rep
-      .code(500)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: 500,
-          status: "Internal server error",
-          message: "An unexpected error has occurred!",
-        }),
-      );
+    return rep.code(500).send({
+      code: 500,
+      status: "Internal server error",
+      message: "An unexpected error has occurred!",
+    });
   }
 }
