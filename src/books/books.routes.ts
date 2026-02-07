@@ -107,7 +107,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "number" },
+                  id: { type: "string" },
                   title: { type: "string" },
                   author: { type: "string" },
                   isbn: { type: "string" },
