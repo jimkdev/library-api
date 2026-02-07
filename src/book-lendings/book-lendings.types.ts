@@ -1,4 +1,5 @@
-export type CreateBookLendingDto = {
+export type BookLendingDto = {
+  userId: string;
   bookId: string;
 };
 

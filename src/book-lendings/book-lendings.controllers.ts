@@ -1,13 +1,13 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { DateTime } from "luxon";
+import { QueryResult } from "pg";
+
+import AppConfig from "../config.js";
 
 import {
-  CreateBookLendingDto,
+  BookLendingDto,
   ExtendBookLendingReturnDateDto,
 } from "./book-lendings.types.js";
-import { QueryResult } from "pg";
-import AppConfig from "../config.js";
-import { Book } from "../books/books.types.js";
 
 export async function lendBook(
   this: FastifyInstance,
@@ -15,9 +15,34 @@ export async function lendBook(
   rep: FastifyReply,
 ) {
   try {
-    const { bookId } = req.body as CreateBookLendingDto;
+    const { userId, bookId } = req.body as BookLendingDto;
 
     const config = AppConfig.getInstance();
+
+    if (!userId) {
+      return rep.code(400).send({
+        code: 400,
+        status: "Bad request",
+        message: "Invalid user id!",
+      });
+    }
+
+    const user = (
+      (await this.database.query(
+        `
+      SELECT u.id from users u WHERE u.id = $1
+    `,
+        [userId],
+      )) as QueryResult<{ id: string }>
+    ).rows[0];
+
+    if (!user) {
+      return rep.code(400).send({
+        code: 404,
+        status: "Not Found",
+        message: "User does not exist!",
+      });
+    }
 
     if (!bookId) {
       return rep.code(200).send({
@@ -46,7 +71,7 @@ export async function lendBook(
           INSERT INTO book_lendings (user_id, book_id, date_of_return) VALUES ($1, $2, $3);
         `,
           [
-            this.user,
+            userId,
             bookId,
             DateTime.now()
               .toUTC()
