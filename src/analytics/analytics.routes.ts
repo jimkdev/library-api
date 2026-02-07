@@ -3,7 +3,7 @@ import { FastifyInstance } from "fastify";
 
 import { isAuthorized } from "../auth/auth.middleware.js";
 
-import { getAnalytics } from "./analytyics.controllers.js";
+import { getAnalytics } from "./analytics.controllers.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/analytics";
