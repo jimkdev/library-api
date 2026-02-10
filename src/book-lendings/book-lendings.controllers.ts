@@ -219,3 +219,99 @@ export async function extendReturnDate(
     });
   }
 }
+
+export async function returnBook(
+  this: FastifyInstance,
+  req: FastifyRequest,
+  rep: FastifyReply,
+) {
+  try {
+    const { userId, bookId } = req.body as BookLendingDto;
+
+    if (!userId) {
+      return rep.code(400).send({
+        code: 400,
+        status: "Bad request",
+        message: "Invalid user id!",
+      });
+    }
+
+    const user = (
+      (await this.database.query(
+        `
+        SELECT u.id from users u WHERE u.id = $1
+      `,
+        [userId],
+      )) as QueryResult<{ id: string }>
+    ).rows[0];
+
+    if (!user) {
+      return rep.code(400).send({
+        code: 404,
+        status: "Not Found",
+        message: "User does not exist!",
+      });
+    }
+
+    if (!bookId) {
+      return rep.code(200).send({
+        code: 400,
+        status: "Bad request",
+        message: "Invalid book id!",
+      });
+    }
+
+    const bookData = (
+      await this.database.query(
+        `
+          SELECT quantity
+          FROM books
+          WHERE id = $1;
+        `,
+        [bookId],
+      )
+    ).rows[0];
+
+    await this.database.query("BEGIN;");
+    let affectedRows = (
+      await this.database.query(
+        `
+      UPDATE book_lendings
+      SET returned_at = $1
+      WHERE user_id = $2 AND book_id = $3 AND returned_at IS NULL;
+    `,
+        [DateTime.now().toUTC(), userId, bookId],
+      )
+    ).rowCount;
+
+    if (affectedRows === 0) {
+      throw new Error("Book lending could not be updated!");
+    }
+
+    affectedRows = (
+      await this.database.query(
+        `
+      UPDATE books
+      SET quantity = $1, is_available = $2
+      WHERE id = $3;
+    `,
+        [bookData.quantity + 1, true, bookId],
+      )
+    ).rowCount;
+
+    if (affectedRows === 0) {
+      throw new Error("Book could not be updated!");
+    }
+
+    await this.database.query("COMMIT;");
+
+    rep.code(200).send({
+      code: 200,
+      status: "OK",
+      message: "Book has been returned!",
+    });
+  } catch (error) {
+    console.error(error);
+    await this.database.query("ROLLBACK;");
+  }
+}

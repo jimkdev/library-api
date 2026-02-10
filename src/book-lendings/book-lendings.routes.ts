@@ -3,7 +3,11 @@ import { FastifyInstance } from "fastify";
 
 import { isAuthorized } from "../auth/auth.middleware.js";
 
-import { extendReturnDate, lendBook } from "./book-lendings.controllers.js";
+import {
+  extendReturnDate,
+  lendBook,
+  returnBook,
+} from "./book-lendings.controllers.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/books/lendings";
@@ -42,6 +46,34 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     },
     preHandler: [isAuthorized],
     handler: extendReturnDate,
+  });
+
+  app.route({
+    url: `${baseUrl}/return-book`,
+    method: "POST",
+    preHandler: [isAuthorized],
+    schema: {
+      description: "Return a lent book",
+      tags: ["book-lendings"],
+      body: {
+        type: "object",
+        properties: {
+          userId: { type: "string" },
+          bookId: { type: "string" },
+        },
+      },
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            code: { type: "number" },
+            status: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+    },
+    handler: returnBook,
   });
 
   done();
