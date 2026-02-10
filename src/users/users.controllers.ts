@@ -13,6 +13,7 @@ import {
   UserLoginRequestBody,
   UserRegistrationRequestBody,
 } from "./users.types.js";
+import { StatusCodes } from "../enums/status-codes.js";
 
 export async function login(
   this: FastifyInstance,
@@ -30,8 +31,8 @@ export async function login(
     const user = queryResponse.rows[0] as User;
 
     if (!user) {
-      return rep.code(404).send({
-        code: 404,
+      return rep.code(StatusCodes.NOT_FOUND).send({
+        code: StatusCodes.NOT_FOUND,
         status: "Not found",
         message: "User not found!",
       });
@@ -41,8 +42,8 @@ export async function login(
       !user.password ||
       !(user.password && (await bcrypt.compare(password, user.password)))
     ) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Invalid password!",
       });
@@ -79,7 +80,7 @@ export async function login(
     );
 
     rep
-      .code(200)
+      .code(StatusCodes.OK)
       .setCookie("refresh_token", refreshToken, {
         httpOnly: true,
         secure: config.getIsProductionEnvironment(),
@@ -88,8 +89,8 @@ export async function login(
         maxAge: 7 * 24 * 60 * 60, // 7 days
       })
       .send({
-        code: 200,
-        status: "Ok",
+        code: StatusCodes.OK,
+        status: "OK",
         data: {
           accessToken,
         },
@@ -124,15 +125,15 @@ export async function register(
       ],
     );
 
-    rep.code(201).send({
-      code: 201,
+    rep.code(StatusCodes.CREATED).send({
+      code: StatusCodes.CREATED,
       status: "Created",
       message: "User has been registered successfully!",
     });
   } catch (error) {
     console.log(error);
-    rep.code(500).send({
-      code: 500,
+    rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal server error",
       message: "Error on user registration!",
     });
@@ -147,8 +148,8 @@ export async function refresh(
   const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken) {
-    return rep.code(401).send({
-      code: 401,
+    return rep.code(StatusCodes.UNAUTHORIZED).send({
+      code: StatusCodes.UNAUTHORIZED,
       status: "Unauthorized",
       message: "Unauthorized!",
     });
@@ -168,8 +169,8 @@ export async function refresh(
       !tokenData ||
       (tokenData && (tokenData.is_revoked || tokenData.is_expired))
     ) {
-      return rep.code(401).send({
-        code: 401,
+      return rep.code(StatusCodes.UNAUTHORIZED).send({
+        code: StatusCodes.UNAUTHORIZED,
         status: "Unauthorized",
         message: "Unauthorized! (Invalid token)",
       });
@@ -184,8 +185,8 @@ export async function refresh(
         [tokenData["id"]],
       );
 
-      return rep.code(401).send({
-        code: 401,
+      return rep.code(StatusCodes.UNAUTHORIZED).send({
+        code: StatusCodes.UNAUTHORIZED,
         status: "Unauthorized",
         message: "Token has expired!",
       });
@@ -204,8 +205,8 @@ export async function refresh(
       },
     );
 
-    rep.code(200).send({
-      code: 200,
+    rep.code(StatusCodes.OK).send({
+      code: StatusCodes.OK,
       status: "OK",
       data: {
         accessToken,
@@ -226,8 +227,8 @@ export async function logout(
   const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken || refreshToken === "") {
-    return rep.code(400).send({
-      code: 400,
+    return rep.code(StatusCodes.BAD_REQUEST).send({
+      code: StatusCodes.BAD_REQUEST,
       status: "Bad request",
       message: "Missing refresh token!",
     });
@@ -242,8 +243,8 @@ export async function logout(
     const tokenData = response.rows[0];
 
     if (tokenData && tokenData.is_revoked) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "User is not signed in!",
       });
@@ -259,7 +260,7 @@ export async function logout(
     const config = AppConfig.getInstance();
 
     rep
-      .code(200)
+      .code(StatusCodes.OK)
       .clearCookie("refresh_token", {
         httpOnly: true,
         secure: config.getIsProductionEnvironment(),
@@ -267,7 +268,7 @@ export async function logout(
         path: "/",
       })
       .send({
-        code: 200,
+        code: StatusCodes.OK,
         status: "OK",
         message: "User has been signed out!",
       });

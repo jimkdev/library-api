@@ -8,6 +8,7 @@ import {
 import PaginationService from "../utils/pagination/pagination.service.js";
 
 import { Book, GetBookParams } from "./books.types.js";
+import { StatusCodes } from "../enums/status-codes.js";
 
 export async function addBooks(
   this: FastifyInstance,
@@ -45,16 +46,16 @@ export async function addBooks(
     await this.database.query(query, values);
 
     const response = {
-      code: 201,
+      code: StatusCodes.CREATED,
       status: "Created",
       message: "Book(s) have been created!",
     };
 
-    rep.code(201).send(response);
+    rep.code(StatusCodes.CREATED).send(response);
   } catch (error) {
     console.log(error);
-    rep.code(500).send({
-      code: 500,
+    rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal server error",
       message: "Book(s) could not be stored!",
     });
@@ -105,7 +106,7 @@ export async function getBooks(
     ]);
 
     const response = {
-      code: 200,
+      code: StatusCodes.OK,
       status: "OK",
       data: [...result.rows],
       pagination: {
@@ -118,11 +119,11 @@ export async function getBooks(
       },
       message: "Books have been retrieved!",
     };
-    rep.code(200).send(response);
+    rep.code(StatusCodes.OK).send(response);
   } catch (error) {
     console.error(error);
-    rep.code(500).send({
-      code: 500,
+    rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal server error",
       message: "Could not fetch books!",
     });
@@ -137,8 +138,8 @@ export async function getBook(
   const { id } = req.params as GetBookParams;
 
   if (!id || id === "") {
-    return rep.code(400).send({
-      code: 400,
+    return rep.code(StatusCodes.BAD_REQUEST).send({
+      code: StatusCodes.BAD_REQUEST,
       status: "Bad request!",
       message: "Invalid id!",
     });
@@ -154,15 +155,15 @@ export async function getBook(
       [id],
     );
 
-    rep.code(200).send({
-      code: 200,
+    rep.code(StatusCodes.OK).send({
+      code: StatusCodes.OK,
       status: "OK",
       data: { ...result.rows[0] },
     });
   } catch (error) {
     console.log(error);
-    return rep.code(500).send({
-      code: 500,
+    return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal Server Error",
       message: "An unexpected error occurred!",
     });
@@ -181,8 +182,8 @@ export async function removeBooks(
     const separator = separators.find((separator) => ids.includes(separator));
 
     if (!separator) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Invalid separator!",
       });
@@ -198,8 +199,8 @@ export async function removeBooks(
     );
 
     if (queryParams.length === 0) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Missing query params!",
       });
@@ -215,16 +216,16 @@ export async function removeBooks(
         )
       ).rowCount ?? 0;
 
-    rep.code(200).send({
-      code: 200,
+    rep.code(StatusCodes.OK).send({
+      code: StatusCodes.OK,
       status: "OK",
       message: "Books have been removed successfully!",
       data: { rowsAffected },
     });
   } catch (error) {
     console.error(error);
-    return rep.code(500).send({
-      code: 500,
+    return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal Server Error",
       message: "An unexpected error occurred!",
     });

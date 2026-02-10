@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import AppConfig from "../config.js";
+import { StatusCodes } from "../enums/status-codes.js";
 
 export function isAuthorized(
   this: FastifyInstance,
@@ -16,8 +17,8 @@ export function isAuthorized(
   const refreshToken = req.cookies["refresh_token"];
 
   if (!token || token === "" || !refreshToken || refreshToken === "") {
-    return rep.code(401).send({
-      code: 401,
+    return rep.code(StatusCodes.UNAUTHORIZED).send({
+      code: StatusCodes.UNAUTHORIZED,
       status: "Unauthorized",
       message: "Unauthorized",
     });
@@ -31,8 +32,8 @@ export function isAuthorized(
     this.user = data.userId;
   } catch (error) {
     console.log(error);
-    return rep.code(401).send({
-      code: 401,
+    return rep.code(StatusCodes.UNAUTHORIZED).send({
+      code: StatusCodes.UNAUTHORIZED,
       status: "Unauthorized",
       message: "Unauthorized",
     });

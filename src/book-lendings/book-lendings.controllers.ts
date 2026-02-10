@@ -8,6 +8,7 @@ import {
   BookLendingDto,
   ExtendBookLendingReturnDateDto,
 } from "./book-lendings.types.js";
+import { StatusCodes } from "../enums/status-codes.js";
 
 export async function lendBook(
   this: FastifyInstance,
@@ -20,8 +21,8 @@ export async function lendBook(
     const config = AppConfig.getInstance();
 
     if (!userId) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Invalid user id!",
       });
@@ -37,16 +38,16 @@ export async function lendBook(
     ).rows[0];
 
     if (!user) {
-      return rep.code(400).send({
-        code: 404,
+      return rep.code(StatusCodes.NOT_FOUND).send({
+        code: StatusCodes.NOT_FOUND,
         status: "Not Found",
         message: "User does not exist!",
       });
     }
 
     if (!bookId) {
-      return rep.code(200).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Invalid book id!",
       });
@@ -106,16 +107,16 @@ export async function lendBook(
         await this.database.query("ROLLBACK;");
       }
     } else {
-      rep.code(200).send({
-        code: 200,
+      rep.code(StatusCodes.OK).send({
+        code: StatusCodes.OK,
         status: "OK",
         message: "Book is not available!",
       });
     }
   } catch (error) {
     console.log(error);
-    return rep.code(500).send({
-      code: 500,
+    return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal server error",
       message: "An unexpected error has occurred!",
     });
@@ -170,16 +171,16 @@ export async function extendReturnDate(
     const data = response.rows[0];
 
     if (!data) {
-      return rep.code(404).send({
-        code: 404,
+      return rep.code(StatusCodes.NOT_FOUND).send({
+        code: StatusCodes.NOT_FOUND,
         status: "Not found",
         message: "Book not found!",
       });
     }
 
     if (data.date_extended) {
-      return rep.code(200).send({
-        code: 200,
+      return rep.code(StatusCodes.OK).send({
+        code: StatusCodes.OK,
         status: "OK",
         message: "You have already extended the return period!",
       });
@@ -190,8 +191,8 @@ export async function extendReturnDate(
         (validExtensionDay) => validExtensionDay === extensionDays,
       )
     ) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Extension days number is not in available extension days!",
       });
@@ -212,8 +213,8 @@ export async function extendReturnDate(
     console.log(error);
     await this.database.query("ROLLBACK;");
 
-    rep.code(500).send({
-      code: 500,
+    rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal server error",
       message: "An unexpected error has occurred!",
     });
@@ -229,8 +230,8 @@ export async function returnBook(
     const { userId, bookId } = req.body as BookLendingDto;
 
     if (!userId) {
-      return rep.code(400).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Invalid user id!",
       });
@@ -246,16 +247,16 @@ export async function returnBook(
     ).rows[0];
 
     if (!user) {
-      return rep.code(400).send({
-        code: 404,
+      return rep.code(StatusCodes.NOT_FOUND).send({
+        code: StatusCodes.NOT_FOUND,
         status: "Not Found",
         message: "User does not exist!",
       });
     }
 
     if (!bookId) {
-      return rep.code(200).send({
-        code: 400,
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
         status: "Bad request",
         message: "Invalid book id!",
       });
@@ -305,8 +306,8 @@ export async function returnBook(
 
     await this.database.query("COMMIT;");
 
-    rep.code(200).send({
-      code: 200,
+    rep.code(StatusCodes.OK).send({
+      code: StatusCodes.OK,
       status: "OK",
       message: "Book has been returned!",
     });

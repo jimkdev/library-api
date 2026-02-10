@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { Analytics } from "./analytics.types.js";
+import { StatusCodes } from "../enums/status-codes.js";
 
 export async function getAnalytics(
   this: FastifyInstance,
@@ -27,8 +28,8 @@ export async function getAnalytics(
   `)
     ).rows[0] as Analytics;
 
-    rep.code(200).send({
-      code: 200,
+    rep.code(StatusCodes.OK).send({
+      code: StatusCodes.OK,
       status: "OK",
       data: {
         totalBookLendings: analytics["total_book_lendings"],
@@ -38,8 +39,8 @@ export async function getAnalytics(
     });
   } catch (error) {
     console.log(error);
-    return rep.code(500).send({
-      code: 500,
+    return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: "Internal server error",
       message: "An unexpected error has occurred!",
     });
