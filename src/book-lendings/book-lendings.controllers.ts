@@ -149,34 +149,6 @@ export async function extendReturnDate(
 ) {
   const { bookLendingId, extensionDays } =
     req.body as ExtendBookLendingReturnDateDto;
-  // const numOfDays = Number.parseInt(extensionDays);
-  // const id = Number.parseInt(bookLendingId);
-
-  // if (Number.isNaN(numOfDays)) {
-  //   return rep
-  //     .code(400)
-  //     .type("application/json")
-  //     .send(
-  //       JSON.stringify({
-  //         code: 400,
-  //         status: "Bad request",
-  //         message: "The number of days is invalid!",
-  //       }),
-  //     );
-  // }
-  //
-  // if (Number.isNaN(id)) {
-  //   return rep
-  //     .code(400)
-  //     .type("application/json")
-  //     .send(
-  //       JSON.stringify({
-  //         code: 400,
-  //         status: "Bad request",
-  //         message: "The book lending id is invalid!",
-  //       }),
-  //     );
-  // }
 
   const validExtensionDays: number[] = [3, 5, 7];
 
