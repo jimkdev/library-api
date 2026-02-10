@@ -65,6 +65,25 @@ export async function lendBook(
     ).rows[0];
 
     if (bookData.is_available) {
+      const active_book_lending_id = (
+        await this.database.query(
+          `
+        SELECT id FROM book_lendings
+        WHERE user_id = $1 AND returned_at IS NULL;
+      `,
+          [userId],
+        )
+      ).rows[0];
+
+      if (active_book_lending_id) {
+        return rep.code(StatusCodes.BAD_REQUEST).send({
+          code: StatusCodes.BAD_REQUEST,
+          status: "Bad request",
+          message:
+            "This user has already been given a book which is not yet returned!",
+        });
+      }
+
       try {
         await this.database.query("BEGIN;");
         await this.database.query(
