@@ -15,6 +15,7 @@ import {
 } from "./users.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
+import { ResponseMessages } from "../enums/response-messages.js";
 
 export async function login(
   this: FastifyInstance,
@@ -35,7 +36,7 @@ export async function login(
       return rep.code(StatusCodes.NOT_FOUND).send({
         code: StatusCodes.NOT_FOUND,
         status: StatusDescriptions.NOT_FOUND,
-        message: "User not found!",
+        message: ResponseMessages.USER_NOT_FOUND_404,
       });
     }
 
@@ -46,7 +47,7 @@ export async function login(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Invalid password!",
+        message: ResponseMessages.INVALID_PASSWORD_400,
       });
     }
 
@@ -129,14 +130,14 @@ export async function register(
     rep.code(StatusCodes.CREATED).send({
       code: StatusCodes.CREATED,
       status: StatusDescriptions.CREATED,
-      message: "User has been registered successfully!",
+      message: ResponseMessages.USER_HAS_BEEN_REGISTERED_201,
     });
   } catch (error) {
     console.log(error);
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "Error on user registration!",
+      message: ResponseMessages.USER_REGISTRATION_ERROR_500,
     });
   }
 }
@@ -152,7 +153,7 @@ export async function refresh(
     return rep.code(StatusCodes.UNAUTHORIZED).send({
       code: StatusCodes.UNAUTHORIZED,
       status: StatusDescriptions.UNAUTHORIZED,
-      message: "Unauthorized!",
+      message: ResponseMessages.UNAUTHORIZED_401,
     });
   }
 
@@ -173,7 +174,7 @@ export async function refresh(
       return rep.code(StatusCodes.UNAUTHORIZED).send({
         code: StatusCodes.UNAUTHORIZED,
         status: StatusDescriptions.UNAUTHORIZED,
-        message: "Unauthorized! (Invalid token)",
+        message: ResponseMessages.UNAUTHORIZED_INVALID_TOKEN_401,
       });
     }
     const expires_at = DateTime.fromISO(
@@ -189,7 +190,7 @@ export async function refresh(
       return rep.code(StatusCodes.UNAUTHORIZED).send({
         code: StatusCodes.UNAUTHORIZED,
         status: StatusDescriptions.UNAUTHORIZED,
-        message: "Token has expired!",
+        message: ResponseMessages.TOKEN_EXPIRED_401,
       });
     }
 
@@ -212,7 +213,7 @@ export async function refresh(
       data: {
         accessToken,
       },
-      message: "A new token has been created!",
+      message: ResponseMessages.TOKEN_CREATED_200,
     });
   } catch (error) {
     console.log(error);
@@ -231,7 +232,7 @@ export async function logout(
     return rep.code(StatusCodes.BAD_REQUEST).send({
       code: StatusCodes.BAD_REQUEST,
       status: StatusDescriptions.BAD_REQUEST,
-      message: "Missing refresh token!",
+      message: ResponseMessages.MISSING_REFRESH_TOKEN_400,
     });
   }
 
@@ -244,10 +245,10 @@ export async function logout(
     const tokenData = response.rows[0];
 
     if (tokenData && tokenData.is_revoked) {
-      return rep.code(StatusCodes.BAD_REQUEST).send({
-        code: StatusCodes.BAD_REQUEST,
-        status: StatusDescriptions.BAD_REQUEST,
-        message: "User is not signed in!",
+      return rep.code(StatusCodes.UNAUTHORIZED).send({
+        code: StatusCodes.UNAUTHORIZED,
+        status: StatusDescriptions.UNAUTHORIZED,
+        message: ResponseMessages.USER_NOT_SIGNED_IN_401,
       });
     }
 
@@ -271,7 +272,7 @@ export async function logout(
       .send({
         code: StatusCodes.OK,
         status: StatusDescriptions.OK,
-        message: "User has been signed out!",
+        message: ResponseMessages.USER_SIGNED_OUT_200,
       });
   } catch (error) {
     console.log(error);

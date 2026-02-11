@@ -3,6 +3,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { User, UserRegistrationRequestBody } from "./users.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
+import { ResponseMessages } from "../enums/response-messages.js";
 
 export async function findUserByUsername(
   this: FastifyInstance,
@@ -20,7 +21,7 @@ export async function findUserByUsername(
     return rep.code(StatusCodes.CONFLICT).send({
       code: StatusCodes.CONFLICT,
       status: StatusDescriptions.CONFLICT,
-      message: "A user already exists with the same username!",
+      message: ResponseMessages.USER_EXISTS_WITH_USERNAME_409,
     });
   }
 }
@@ -41,7 +42,7 @@ export async function findUserByEmail(
     return rep.code(StatusCodes.CONFLICT).send({
       code: StatusCodes.CONFLICT,
       status: StatusDescriptions.CONFLICT,
-      message: "A user already exists with the same email!",
+      message: ResponseMessages.USER_EXISTS_WITH_EMAIL_409,
     });
   }
 }
@@ -62,7 +63,7 @@ export async function findUserByPhoneNumber(
     return rep.code(StatusCodes.CONFLICT).send({
       code: StatusCodes.CONFLICT,
       status: StatusDescriptions.CONFLICT,
-      message: "A user already exists with the same phone number!",
+      message: ResponseMessages.USER_EXISTS_WITH_PHONE_NUMBER_409,
     });
   }
 }

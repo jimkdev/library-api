@@ -4,6 +4,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import AppConfig from "../config.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
+import { ResponseMessages } from "../enums/response-messages.js";
 
 export function isAuthorized(
   this: FastifyInstance,
@@ -21,7 +22,7 @@ export function isAuthorized(
     return rep.code(StatusCodes.UNAUTHORIZED).send({
       code: StatusCodes.UNAUTHORIZED,
       status: StatusDescriptions.UNAUTHORIZED,
-      message: "Unauthorized",
+      message: ResponseMessages.UNAUTHORIZED_401,
     });
   }
 
@@ -36,7 +37,7 @@ export function isAuthorized(
     return rep.code(StatusCodes.UNAUTHORIZED).send({
       code: StatusCodes.UNAUTHORIZED,
       status: StatusDescriptions.UNAUTHORIZED,
-      message: "Unauthorized",
+      message: ResponseMessages.UNAUTHORIZED_401,
     });
   }
 

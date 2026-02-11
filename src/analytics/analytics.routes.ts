@@ -21,6 +21,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
           properties: {
             code: { type: "number" },
             status: { type: "string" },
+            message: { type: "string" },
             data: {
               type: "object",
               properties: {

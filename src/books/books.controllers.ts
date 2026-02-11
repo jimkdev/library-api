@@ -10,6 +10,7 @@ import PaginationService from "../utils/pagination/pagination.service.js";
 import { Book, GetBookParams } from "./books.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
+import { ResponseMessages } from "../enums/response-messages.js";
 
 export async function addBooks(
   this: FastifyInstance,
@@ -49,7 +50,7 @@ export async function addBooks(
     const response = {
       code: StatusCodes.CREATED,
       status: StatusDescriptions.CREATED,
-      message: "Book(s) have been created!",
+      message: ResponseMessages.BOOK_CREATED_201,
     };
 
     rep.code(StatusCodes.CREATED).send(response);
@@ -58,7 +59,7 @@ export async function addBooks(
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "Book(s) could not be stored!",
+      message: ResponseMessages.BOOK_COULD_NOT_BE_STORED_500,
     });
   }
 }
@@ -118,7 +119,7 @@ export async function getBooks(
         nextPage: paginationDetails.nextPage,
         prevPage: paginationDetails.previousPage,
       },
-      message: "Books have been retrieved!",
+      message: ResponseMessages.BOOK_HAS_BEEN_RETRIEVED_200,
     };
     rep.code(StatusCodes.OK).send(response);
   } catch (error) {
@@ -126,7 +127,7 @@ export async function getBooks(
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "Could not fetch books!",
+      message: ResponseMessages.BOOK_COULD_NOT_BE_RETRIEVED_500,
     });
   }
 }
@@ -142,7 +143,7 @@ export async function getBook(
     return rep.code(StatusCodes.BAD_REQUEST).send({
       code: StatusCodes.BAD_REQUEST,
       status: StatusDescriptions.BAD_REQUEST,
-      message: "Invalid id!",
+      message: ResponseMessages.INVALID_BOOK_ID_400,
     });
   }
 
@@ -159,6 +160,7 @@ export async function getBook(
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
       status: StatusDescriptions.OK,
+      message: ResponseMessages.BOOK_HAS_BEEN_RETRIEVED_200,
       data: { ...result.rows[0] },
     });
   } catch (error) {
@@ -166,7 +168,7 @@ export async function getBook(
     return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "An unexpected error occurred!",
+      message: ResponseMessages.UNEXPECTED_ERROR_500,
     });
   }
 }
@@ -186,7 +188,7 @@ export async function removeBooks(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusCodes.BAD_REQUEST,
-        message: "Invalid separator!",
+        message: ResponseMessages.INVALID_SEPARATOR_400,
       });
     }
 
@@ -203,7 +205,7 @@ export async function removeBooks(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Missing query params!",
+        message: ResponseMessages.MISSING_QUERY_PARAMS_400,
       });
     }
 
@@ -220,7 +222,7 @@ export async function removeBooks(
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
       status: StatusDescriptions.OK,
-      message: "Books have been removed successfully!",
+      message: ResponseMessages.BOOK_REMOVED_200,
       data: { rowsAffected },
     });
   } catch (error) {
@@ -228,7 +230,7 @@ export async function removeBooks(
     return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "An unexpected error occurred!",
+      message: ResponseMessages.UNEXPECTED_ERROR_500,
     });
   }
 }

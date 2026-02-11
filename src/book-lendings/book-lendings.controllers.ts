@@ -10,6 +10,7 @@ import {
 } from "./book-lendings.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
+import { ResponseMessages } from "../enums/response-messages.js";
 
 export async function lendBook(
   this: FastifyInstance,
@@ -25,7 +26,7 @@ export async function lendBook(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Invalid user id!",
+        message: ResponseMessages.INVALID_USER_ID_400,
       });
     }
 
@@ -42,7 +43,7 @@ export async function lendBook(
       return rep.code(StatusCodes.NOT_FOUND).send({
         code: StatusCodes.NOT_FOUND,
         status: StatusDescriptions.NOT_FOUND,
-        message: "User does not exist!",
+        message: ResponseMessages.USER_NOT_FOUND_404,
       });
     }
 
@@ -50,7 +51,7 @@ export async function lendBook(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Invalid book id!",
+        message: ResponseMessages.INVALID_BOOK_ID_400,
       });
     }
 
@@ -80,8 +81,7 @@ export async function lendBook(
         return rep.code(StatusCodes.BAD_REQUEST).send({
           code: StatusCodes.BAD_REQUEST,
           status: StatusDescriptions.BAD_REQUEST,
-          message:
-            "This user has already been given a book which is not yet returned!",
+          message: ResponseMessages.BOOK_NOT_RETURNED_400,
         });
       }
 
@@ -130,7 +130,7 @@ export async function lendBook(
       rep.code(StatusCodes.OK).send({
         code: StatusCodes.OK,
         status: StatusDescriptions.OK,
-        message: "Book is not available!",
+        message: ResponseMessages.BOOK_NOT_AVAILABLE_200,
       });
     }
   } catch (error) {
@@ -138,7 +138,7 @@ export async function lendBook(
     return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "An unexpected error has occurred!",
+      message: ResponseMessages.UNEXPECTED_ERROR_500,
     });
   }
 }
@@ -166,7 +166,7 @@ export async function extendReturnDate(
       return rep.code(StatusCodes.NOT_FOUND).send({
         code: StatusCodes.NOT_FOUND,
         status: StatusDescriptions.NOT_FOUND,
-        message: "Book not found!",
+        message: ResponseMessages.BOOK_NOT_FOUND_404,
       });
     }
 
@@ -174,7 +174,7 @@ export async function extendReturnDate(
       return rep.code(StatusCodes.OK).send({
         code: StatusCodes.OK,
         status: StatusDescriptions.OK,
-        message: "You have already extended the return period!",
+        message: ResponseMessages.RETURN_PERIOD_EXTENDED_200,
       });
     }
 
@@ -186,7 +186,7 @@ export async function extendReturnDate(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Extension days number is not in available extension days!",
+        message: ResponseMessages.INVALID_EXTENSION_DAY_400,
       });
     }
 
@@ -208,7 +208,7 @@ export async function extendReturnDate(
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       status: StatusDescriptions.INTERNAL_SERVER_ERROR,
-      message: "An unexpected error has occurred!",
+      message: ResponseMessages.UNEXPECTED_ERROR_500,
     });
   }
 }
@@ -225,7 +225,7 @@ export async function returnBook(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Invalid user id!",
+        message: ResponseMessages.INVALID_USER_ID_400,
       });
     }
 
@@ -242,7 +242,7 @@ export async function returnBook(
       return rep.code(StatusCodes.NOT_FOUND).send({
         code: StatusCodes.NOT_FOUND,
         status: StatusDescriptions.NOT_FOUND,
-        message: "User does not exist!",
+        message: ResponseMessages.USER_NOT_FOUND_404,
       });
     }
 
@@ -250,7 +250,7 @@ export async function returnBook(
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
         status: StatusDescriptions.BAD_REQUEST,
-        message: "Invalid book id!",
+        message: ResponseMessages.INVALID_BOOK_ID_400,
       });
     }
 
@@ -301,7 +301,7 @@ export async function returnBook(
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
       status: StatusDescriptions.OK,
-      message: "Book has been returned!",
+      message: ResponseMessages.BOOK_HAS_BEEN_RETURNED_200,
     });
   } catch (error) {
     console.error(error);
