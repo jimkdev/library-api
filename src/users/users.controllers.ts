@@ -14,6 +14,7 @@ import {
   UserRegistrationRequestBody,
 } from "./users.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
+import { StatusDescriptions } from "../enums/status-descriptions.js";
 
 export async function login(
   this: FastifyInstance,
@@ -33,7 +34,7 @@ export async function login(
     if (!user) {
       return rep.code(StatusCodes.NOT_FOUND).send({
         code: StatusCodes.NOT_FOUND,
-        status: "Not found",
+        status: StatusDescriptions.NOT_FOUND,
         message: "User not found!",
       });
     }
@@ -44,7 +45,7 @@ export async function login(
     ) {
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
-        status: "Bad request",
+        status: StatusDescriptions.BAD_REQUEST,
         message: "Invalid password!",
       });
     }
@@ -90,7 +91,7 @@ export async function login(
       })
       .send({
         code: StatusCodes.OK,
-        status: "OK",
+        status: StatusDescriptions.OK,
         data: {
           accessToken,
         },
@@ -127,14 +128,14 @@ export async function register(
 
     rep.code(StatusCodes.CREATED).send({
       code: StatusCodes.CREATED,
-      status: "Created",
+      status: StatusDescriptions.CREATED,
       message: "User has been registered successfully!",
     });
   } catch (error) {
     console.log(error);
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
-      status: "Internal server error",
+      status: StatusDescriptions.INTERNAL_SERVER_ERROR,
       message: "Error on user registration!",
     });
   }
@@ -150,7 +151,7 @@ export async function refresh(
   if (!refreshToken) {
     return rep.code(StatusCodes.UNAUTHORIZED).send({
       code: StatusCodes.UNAUTHORIZED,
-      status: "Unauthorized",
+      status: StatusDescriptions.UNAUTHORIZED,
       message: "Unauthorized!",
     });
   }
@@ -171,7 +172,7 @@ export async function refresh(
     ) {
       return rep.code(StatusCodes.UNAUTHORIZED).send({
         code: StatusCodes.UNAUTHORIZED,
-        status: "Unauthorized",
+        status: StatusDescriptions.UNAUTHORIZED,
         message: "Unauthorized! (Invalid token)",
       });
     }
@@ -187,7 +188,7 @@ export async function refresh(
 
       return rep.code(StatusCodes.UNAUTHORIZED).send({
         code: StatusCodes.UNAUTHORIZED,
-        status: "Unauthorized",
+        status: StatusDescriptions.UNAUTHORIZED,
         message: "Token has expired!",
       });
     }
@@ -207,7 +208,7 @@ export async function refresh(
 
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
-      status: "OK",
+      status: StatusDescriptions.OK,
       data: {
         accessToken,
       },
@@ -229,7 +230,7 @@ export async function logout(
   if (!refreshToken || refreshToken === "") {
     return rep.code(StatusCodes.BAD_REQUEST).send({
       code: StatusCodes.BAD_REQUEST,
-      status: "Bad request",
+      status: StatusDescriptions.BAD_REQUEST,
       message: "Missing refresh token!",
     });
   }
@@ -245,7 +246,7 @@ export async function logout(
     if (tokenData && tokenData.is_revoked) {
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
-        status: "Bad request",
+        status: StatusDescriptions.BAD_REQUEST,
         message: "User is not signed in!",
       });
     }
@@ -269,7 +270,7 @@ export async function logout(
       })
       .send({
         code: StatusCodes.OK,
-        status: "OK",
+        status: StatusDescriptions.OK,
         message: "User has been signed out!",
       });
   } catch (error) {

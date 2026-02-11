@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { User, UserRegistrationRequestBody } from "./users.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
+import { StatusDescriptions } from "../enums/status-descriptions.js";
 
 export async function findUserByUsername(
   this: FastifyInstance,
@@ -16,16 +17,11 @@ export async function findUserByUsername(
   );
 
   if (response.rowCount && response.rowCount > 0) {
-    return rep
-      .code(StatusCodes.CONFLICT)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: StatusCodes.CONFLICT,
-          status: "Conflict",
-          message: "A user already exists with the same username!",
-        }),
-      );
+    return rep.code(StatusCodes.CONFLICT).send({
+      code: StatusCodes.CONFLICT,
+      status: StatusDescriptions.CONFLICT,
+      message: "A user already exists with the same username!",
+    });
   }
 }
 
@@ -42,16 +38,11 @@ export async function findUserByEmail(
   );
 
   if (response.rowCount && response.rowCount > 0) {
-    return rep
-      .code(StatusCodes.CONFLICT)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: StatusCodes.CONFLICT,
-          status: "Conflict",
-          message: "A user already exists with the same email!",
-        }),
-      );
+    return rep.code(StatusCodes.CONFLICT).send({
+      code: StatusCodes.CONFLICT,
+      status: StatusDescriptions.CONFLICT,
+      message: "A user already exists with the same email!",
+    });
   }
 }
 
@@ -68,15 +59,10 @@ export async function findUserByPhoneNumber(
   );
 
   if (response.rowCount && response.rowCount > 0) {
-    return rep
-      .code(StatusCodes.CONFLICT)
-      .type("application/json")
-      .send(
-        JSON.stringify({
-          code: StatusCodes.CONFLICT,
-          status: "Conflict",
-          message: "A user already exists with the same phone number!",
-        }),
-      );
+    return rep.code(StatusCodes.CONFLICT).send({
+      code: StatusCodes.CONFLICT,
+      status: StatusDescriptions.CONFLICT,
+      message: "A user already exists with the same phone number!",
+    });
   }
 }

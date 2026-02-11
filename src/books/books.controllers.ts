@@ -9,6 +9,7 @@ import PaginationService from "../utils/pagination/pagination.service.js";
 
 import { Book, GetBookParams } from "./books.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
+import { StatusDescriptions } from "../enums/status-descriptions.js";
 
 export async function addBooks(
   this: FastifyInstance,
@@ -47,7 +48,7 @@ export async function addBooks(
 
     const response = {
       code: StatusCodes.CREATED,
-      status: "Created",
+      status: StatusDescriptions.CREATED,
       message: "Book(s) have been created!",
     };
 
@@ -56,7 +57,7 @@ export async function addBooks(
     console.log(error);
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
-      status: "Internal server error",
+      status: StatusDescriptions.INTERNAL_SERVER_ERROR,
       message: "Book(s) could not be stored!",
     });
   }
@@ -107,7 +108,7 @@ export async function getBooks(
 
     const response = {
       code: StatusCodes.OK,
-      status: "OK",
+      status: StatusDescriptions.OK,
       data: [...result.rows],
       pagination: {
         totalRecords: result.rowCount,
@@ -124,7 +125,7 @@ export async function getBooks(
     console.error(error);
     rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
-      status: "Internal server error",
+      status: StatusDescriptions.INTERNAL_SERVER_ERROR,
       message: "Could not fetch books!",
     });
   }
@@ -140,7 +141,7 @@ export async function getBook(
   if (!id || id === "") {
     return rep.code(StatusCodes.BAD_REQUEST).send({
       code: StatusCodes.BAD_REQUEST,
-      status: "Bad request!",
+      status: StatusDescriptions.BAD_REQUEST,
       message: "Invalid id!",
     });
   }
@@ -157,14 +158,14 @@ export async function getBook(
 
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
-      status: "OK",
+      status: StatusDescriptions.OK,
       data: { ...result.rows[0] },
     });
   } catch (error) {
     console.log(error);
     return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
-      status: "Internal Server Error",
+      status: StatusDescriptions.INTERNAL_SERVER_ERROR,
       message: "An unexpected error occurred!",
     });
   }
@@ -184,7 +185,7 @@ export async function removeBooks(
     if (!separator) {
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
-        status: "Bad request",
+        status: StatusCodes.BAD_REQUEST,
         message: "Invalid separator!",
       });
     }
@@ -201,7 +202,7 @@ export async function removeBooks(
     if (queryParams.length === 0) {
       return rep.code(StatusCodes.BAD_REQUEST).send({
         code: StatusCodes.BAD_REQUEST,
-        status: "Bad request",
+        status: StatusDescriptions.BAD_REQUEST,
         message: "Missing query params!",
       });
     }
@@ -218,7 +219,7 @@ export async function removeBooks(
 
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
-      status: "OK",
+      status: StatusDescriptions.OK,
       message: "Books have been removed successfully!",
       data: { rowsAffected },
     });
@@ -226,7 +227,7 @@ export async function removeBooks(
     console.error(error);
     return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
       code: StatusCodes.INTERNAL_SERVER_ERROR,
-      status: "Internal Server Error",
+      status: StatusDescriptions.INTERNAL_SERVER_ERROR,
       message: "An unexpected error occurred!",
     });
   }
