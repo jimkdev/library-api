@@ -25,3 +25,7 @@ export type User = {
   role: UserRoles;
   is_active: boolean;
 };
+
+export type UserHeaders = {
+  user_id: string;
+};

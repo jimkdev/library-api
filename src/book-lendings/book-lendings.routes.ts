@@ -8,6 +8,7 @@ import {
   lendBook,
   returnBook,
 } from "./book-lendings.controllers.js";
+import { checkIfUserIsActive } from "../users/users.middleware.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/books/lendings";
@@ -26,7 +27,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
         },
       },
     },
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     handler: lendBook,
   });
 
@@ -44,14 +45,14 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
         },
       },
     },
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     handler: extendReturnDate,
   });
 
   app.route({
     url: `${baseUrl}/return-book`,
     method: "POST",
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Return a lent book",
       tags: ["book-lendings"],

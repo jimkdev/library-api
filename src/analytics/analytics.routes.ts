@@ -4,6 +4,7 @@ import { FastifyInstance } from "fastify";
 import { isAuthorized } from "../auth/auth.middleware.js";
 
 import { getAnalytics } from "./analytics.controllers.js";
+import { checkIfUserIsActive } from "../users/users.middleware.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/analytics";
@@ -11,7 +12,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
   app.route({
     url: `${baseUrl}`,
     method: "GET",
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Get analytics",
       tags: ["analytics"],

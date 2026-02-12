@@ -8,6 +8,7 @@ import {
   getBooks,
   removeBooks,
 } from "./books.controllers.js";
+import { checkIfUserIsActive } from "../users/users.middleware.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
   const baseUrl = "/books";
@@ -15,7 +16,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
   app.route({
     url: `${baseUrl}/add`,
     method: "POST",
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Add books",
       tags: ["books"],
@@ -75,7 +76,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
   app.route({
     url: `${baseUrl}`,
     method: "GET",
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Get books",
       tags: ["books"],
@@ -155,7 +156,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
   app.route({
     url: `${baseUrl}/:id`,
     method: "GET",
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Get book",
       tags: ["books"],
@@ -220,7 +221,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
   app.route({
     url: `${baseUrl}/remove`,
     method: "DELETE",
-    preHandler: [isAuthorized],
+    preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Remove books",
       tags: ["books"],
