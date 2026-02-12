@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 import AppConfig from "../config.js";
 import { StatusCodes } from "../enums/status-codes.js";
@@ -27,11 +27,7 @@ export function isAuthorized(
   }
 
   try {
-    const data = jwt.verify(
-      token,
-      config.getJwtAccessTokenSecret(),
-    ) as JwtPayload;
-    this.user = data.userId;
+    jwt.verify(token, config.getJwtAccessTokenSecret());
   } catch (error) {
     console.log(error);
     return rep.code(StatusCodes.UNAUTHORIZED).send({

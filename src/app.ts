@@ -17,7 +17,6 @@ dotenv.config();
 declare module "fastify" {
   interface FastifyInstance {
     database: pg.Pool;
-    user: string | null;
   }
 }
 
