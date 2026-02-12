@@ -18,6 +18,7 @@ export enum ResponseMessages {
   INVALID_SEPARATOR_400 = "Invalid separator!",
   INVALID_PASSWORD_400 = "Invalid password!",
   MISSING_REFRESH_TOKEN_400 = "Missing refresh token!",
+  INACTIVE_USER_400 = "User is inactive!",
   UNAUTHORIZED_401 = "Unauthorized!",
   UNAUTHORIZED_INVALID_TOKEN_401 = "Unauthorized! (Invalid token)",
   TOKEN_EXPIRED_401 = "Token has expired!",

@@ -26,8 +26,12 @@ export async function login(
 
   try {
     const queryResponse = await this.database.query(
-      `SELECT u.id, u.username, u.password, u.first_name, u.last_name, u.email, u.mobile, u.role FROM users u WHERE username = $1`,
-      [`${username.trim()}`],
+      `
+        SELECT
+          u.id, u.username, u.password, u.first_name, u.last_name,
+          u.email, u.mobile, u.role, u.is_active
+        FROM users u WHERE username = $1`,
+      [username.trim()],
     );
 
     const user = queryResponse.rows[0] as User;
@@ -37,6 +41,14 @@ export async function login(
         code: StatusCodes.NOT_FOUND,
         status: StatusDescriptions.NOT_FOUND,
         message: ResponseMessages.USER_NOT_FOUND_404,
+      });
+    }
+
+    if (!user.is_active) {
+      return rep.code(StatusCodes.BAD_REQUEST).send({
+        code: StatusCodes.BAD_REQUEST,
+        status: StatusDescriptions.BAD_REQUEST,
+        message: ResponseMessages.INACTIVE_USER_400,
       });
     }
 

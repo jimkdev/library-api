@@ -1,3 +1,5 @@
+import { UserRoles } from "../enums/users.js";
+
 export type UserRegistrationRequestBody = {
   username: string;
   password: string;
@@ -12,10 +14,6 @@ export type UserLoginRequestBody = {
   password: string;
 };
 
-export type UserLogoutRequestBody = {
-  refreshToken: string;
-};
-
 export type User = {
   id: string;
   username: string;
@@ -24,4 +22,6 @@ export type User = {
   last_name: string;
   email: string;
   mobile: string;
+  role: UserRoles;
+  is_active: boolean;
 };
