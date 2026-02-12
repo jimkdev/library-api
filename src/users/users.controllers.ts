@@ -107,6 +107,9 @@ export async function login(
         status: StatusDescriptions.OK,
         data: {
           accessToken,
+          user: {
+            id: user.id,
+          },
         },
       });
   } catch (error) {
