@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS book_lendings
 CREATE TABLE IF NOT EXISTS refresh_tokens
 (
     id         SERIAL PRIMARY KEY,
-    user_id    UUID         NOT NULL,
+    user_id    UUID         NOT NULL REFERENCES users (id),
     token      VARCHAR(255) NOT NULL,
     is_revoked BOOLEAN      NOT NULL DEFAULT FALSE,
     is_expired BOOLEAN      NOT NULL DEFAULT FALSE,
