@@ -14,9 +14,9 @@ export async function getAnalytics(
     const analytics: Analytics = (
       await this.database.query(`
       SELECT
-        CAST(COUNT(bl.id) AS INT) AS total_book_lendings,
-        CAST(COUNT(DISTINCT u.id) AS INT) AS total_active_users,
-        CAST(COUNT(DISTINCT b.id) AS INT) AS total_available_books
+        CAST(COUNT(bl.id) AS BIGINT) AS total_book_lendings,
+        CAST(COUNT(DISTINCT u.id) AS BIGINT) AS total_active_users,
+        CAST(COUNT(DISTINCT b.id) AS BIGINT) AS total_available_books
       FROM book_lendings bl
       RIGHT JOIN(
           SELECT b1.id
