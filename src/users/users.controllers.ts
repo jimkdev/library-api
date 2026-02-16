@@ -16,6 +16,11 @@ import {
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
 import { ResponseMessages } from "../enums/response-messages.js";
+import {
+  PaginationDetails,
+  PaginationParams,
+} from "../utils/pagination/pagination.types.js";
+import PaginationService from "../utils/pagination/pagination.service.js";
 
 export async function login(
   this: FastifyInstance,
@@ -292,5 +297,70 @@ export async function logout(
   } catch (error) {
     console.log(error);
     throw error;
+  }
+}
+
+export async function getUsers(
+  this: FastifyInstance,
+  req: FastifyRequest,
+  rep: FastifyReply,
+) {
+  try {
+    const { page, limit } = req.query as PaginationParams;
+
+    const paginationService: PaginationService = PaginationService.initialize(
+      Number.parseInt(page.toString()),
+      Number.parseInt(limit.toString()),
+    );
+
+    let query = `SELECT COUNT(u.id) AS count FROM users u;`;
+
+    let result = (await this.database.query(query)).rows[0];
+
+    let paginationDetails: PaginationDetails | undefined;
+    try {
+      paginationDetails = paginationService.paginate(result["count"] as never);
+    } catch (error) {
+      console.log(error);
+      return rep.code(400).send(error);
+    }
+
+    query = `
+      SELECT ROW_NUMBER() OVER (ORDER BY u.created_at)::INT AS id,
+      TRIM(u.username) AS username,
+      TRIM(u.email) AS email,
+      CONCAT(TRIM(u.first_name), ' ', TRIM(u.last_name)) AS full_name,
+      TRIM(u.mobile) AS mobile,
+      u.role
+      FROM users u
+      OFFSET $1 LIMIT $2;
+    `;
+
+    result = await this.database.query(query, [
+      paginationDetails.offset,
+      paginationService.getLimit(),
+    ]);
+
+    rep.code(StatusCodes.OK).send({
+      code: StatusCodes.OK,
+      status: StatusDescriptions.OK,
+      data: [...result.rows],
+      pagination: {
+        totalRecords: result.rowCount,
+        currentPage: paginationService.getCurrentPage(),
+        limit: paginationService.getLimit(),
+        totalPages: paginationDetails.totalPages,
+        nextPage: paginationDetails.nextPage,
+        prevPage: paginationDetails.previousPage,
+      },
+      message: ResponseMessages.USER_HAS_BEEN_RETRIEVED_200,
+    });
+  } catch (error) {
+    console.error(error);
+    return rep.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: StatusDescriptions.INTERNAL_SERVER_ERROR,
+      message: ResponseMessages.UNEXPECTED_ERROR_500,
+    });
   }
 }

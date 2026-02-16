@@ -8,6 +8,7 @@ export enum ResponseMessages {
   BOOK_HAS_BEEN_RETRIEVED_200 = "Book(s) have been retrieved!",
   TOKEN_CREATED_200 = "A new token has been created!",
   USER_SIGNED_OUT_200 = "User has been signed out!",
+  USER_HAS_BEEN_RETRIEVED_200 = "User(s) have been retrieved!",
   BOOK_CREATED_201 = "Book(s) have been created!",
   USER_HAS_BEEN_REGISTERED_201 = "User has been registered successfully!",
   INVALID_USER_ID_400 = "Invalid user ID!",
