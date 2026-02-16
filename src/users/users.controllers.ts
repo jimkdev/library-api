@@ -130,7 +130,7 @@ export async function register(
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await this.database.query(
-      `INSERT INTO users(id, username, password, first_name, last_name, email, mobile) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO users(id, username, password, first_name, last_name, email, mobile) VALUES ($1, TRIM($2), $3, TRIM($4), TRIM($5), TRIM($6), TRIM($7))`,
       [
         uuidv4(),
         username.trim(),
