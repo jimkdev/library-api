@@ -326,12 +326,16 @@ export async function getUsers(
     }
 
     query = `
-      SELECT ROW_NUMBER() OVER (ORDER BY u.created_at)::INT AS id,
+      SELECT ROW_NUMBER() OVER (ORDER BY u.created_at DESC)::INT AS id,
       TRIM(u.username) AS username,
       TRIM(u.email) AS email,
       CONCAT(TRIM(u.first_name), ' ', TRIM(u.last_name)) AS full_name,
       TRIM(u.mobile) AS mobile,
-      u.role
+      REPLACE(
+        u.role::VARCHAR,
+        SUBSTRING(u.role::VARCHAR, 1, 1),
+        UPPER(SUBSTRING(u.role::VARCHAR, 1, 1))
+      ) AS role
       FROM users u
       OFFSET $1 LIMIT $2;
     `;
