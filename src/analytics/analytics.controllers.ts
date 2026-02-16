@@ -13,22 +13,25 @@ export async function getAnalytics(
   try {
     const analytics: Analytics = (
       await this.database.query(`
-      SELECT
-        CAST(COUNT(bl.id) AS BIGINT) AS total_book_lendings,
-        CAST(COUNT(DISTINCT u.id) AS BIGINT) AS total_active_users,
-        CAST(COUNT(DISTINCT b.id) AS BIGINT) AS total_available_books
-      FROM book_lendings bl
-      RIGHT JOIN(
-          SELECT b1.id
-          FROM books b1
-          WHERE b1.is_available
-      ) b
-      ON b.id = bl.book_id
-      FULL OUTER JOIN (
-          SELECT u1.id FROM users u1
-          WHERE u1.is_active
-      ) u
-      ON bl.user_id = u.id;
+         WITH available_books AS (
+           SELECT b.id
+           FROM books b
+           WHERE b.is_available
+         ),
+         active_users AS (
+           SELECT u.id
+           FROM users u
+           WHERE u.is_active
+          )
+          SELECT
+            COUNT(bl.id):: BIGINT AS total_book_lendings,
+            COUNT(DISTINCT au.id):: BIGINT AS total_active_users,
+            COUNT(DISTINCT ab.id):: BIGINT AS total_available_books
+          FROM book_lendings bl
+          RIGHT JOIN available_books ab
+            ON bl.book_id = ab.id
+          FULL OUTER JOIN active_users au
+            ON bl.user_id = au.id;
     `)
     ).rows[0] as Analytics;
 
