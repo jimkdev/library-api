@@ -27,6 +27,8 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
               type: "object",
               properties: {
                 totalBookLendings: { type: "number" },
+                totalClosedBookLendings: { type: "number" },
+                totalOpenBookLendings: { type: "number" },
                 totalActiveUsers: { type: "number" },
                 totalAvailableBooks: { type: "number" },
               },

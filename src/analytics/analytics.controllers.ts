@@ -13,26 +13,29 @@ export async function getAnalytics(
   try {
     const analytics: Analytics = (
       await this.database.query(`
-         WITH available_books AS (
-           SELECT b.id
-           FROM books b
-           WHERE b.is_available
-         ),
-         active_users AS (
-           SELECT u.id
-           FROM users u
-           WHERE u.is_active
-         )
-         SELECT
-           COUNT(bl.id):: BIGINT AS total_book_lendings,
-           COUNT(DISTINCT au.id):: BIGINT AS total_active_users,
-           COUNT(DISTINCT ab.id):: BIGINT AS total_available_books
-         FROM book_lendings bl
-         RIGHT JOIN available_books ab
-           ON bl.book_id = ab.id
-         FULL OUTER JOIN active_users au
-           ON bl.user_id = au.id;
-    `)
+        WITH book_lendings_metrics AS (
+          SELECT
+            COUNT(bl.id)::BIGINT AS total_book_lendings,
+            COUNT(bl.id) FILTER (WHERE bl.returned_at IS NOT NULL)::BIGINT AS total_closed_book_lendings,
+            COUNT(bl.id) FILTER (WHERE bl.returned_at IS NULL)::BIGINT AS total_open_book_lendings
+          FROM book_lendings bl
+        ),
+        user_metrics AS (
+          SELECT
+            COUNT(u.id) FILTER (WHERE u.is_active)::BIGINT AS total_active_users
+          FROM users u
+        ),
+        book_metrics AS (
+          SELECT
+            COUNT(b.id) FILTER (WHERE b.is_available)::BIGINT AS total_available_books
+          FROM books b
+        )
+        SELECT *
+        FROM
+          book_lendings_metrics,
+          user_metrics,
+          book_metrics;
+      `)
     ).rows[0] as Analytics;
 
     rep.code(StatusCodes.OK).send({
@@ -41,6 +44,8 @@ export async function getAnalytics(
       message: ResponseMessages.ANALYTICS_HAVE_BEEN_RETRIEVED_200,
       data: {
         totalBookLendings: analytics["total_book_lendings"],
+        totalClosedBookLendings: analytics["total_closed_book_lendings"],
+        totalOpenBookLendings: analytics["total_open_book_lendings"],
         totalActiveUsers: analytics["total_active_users"],
         totalAvailableBooks: analytics["total_available_books"],
       },
