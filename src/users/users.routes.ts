@@ -263,7 +263,7 @@ export default fp(function (
                   id: { type: "number" },
                   username: { type: "string" },
                   email: { type: "string" },
-                  full_name: { type: "string" },
+                  fullName: { type: "string" },
                   mobile: { type: "string" },
                   role: { type: "string" },
                 },

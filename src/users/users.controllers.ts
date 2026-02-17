@@ -313,9 +313,11 @@ export async function getUsers(
       Number.parseInt(limit.toString()),
     );
 
-    let query = `SELECT COUNT(u.id) AS count FROM users u;`;
-
-    let result = (await this.database.query(query)).rows[0];
+    let result: QueryResult<User> | { count: number } = (
+      await this.database.query<{ count: number }>(
+        `SELECT COUNT(u.id) AS count FROM users u;`,
+      )
+    ).rows[0];
 
     let paginationDetails: PaginationDetails | undefined;
     try {
@@ -325,30 +327,36 @@ export async function getUsers(
       return rep.code(400).send(error);
     }
 
-    query = `
-      SELECT ROW_NUMBER() OVER (ORDER BY u.created_at DESC)::INT AS id,
-      TRIM(u.username) AS username,
-      TRIM(u.email) AS email,
-      CONCAT(TRIM(u.first_name), ' ', TRIM(u.last_name)) AS full_name,
-      TRIM(u.mobile) AS mobile,
-      REPLACE(
-        u.role::VARCHAR,
-        SUBSTRING(u.role::VARCHAR, 1, 1),
-        UPPER(SUBSTRING(u.role::VARCHAR, 1, 1))
-      ) AS role
-      FROM users u
-      OFFSET $1 LIMIT $2;
-    `;
-
-    result = await this.database.query(query, [
-      paginationDetails.offset,
-      paginationService.getLimit(),
-    ]);
+    result = await this.database.query(
+      `
+        SELECT
+          ROW_NUMBER() OVER (ORDER BY u.created_at DESC)::INT AS id,
+          TRIM(u.username) AS username,
+          TRIM(u.email) AS email,
+          CONCAT(TRIM(u.first_name), ' ', TRIM(u.last_name)) AS full_name,
+          TRIM(u.mobile) AS mobile,
+          REPLACE(
+          u.role::VARCHAR,
+          SUBSTRING(u.role::VARCHAR, 1, 1),
+          UPPER(SUBSTRING(u.role::VARCHAR, 1, 1))
+          ) AS role
+        FROM users u
+        OFFSET $1 LIMIT $2;
+      `,
+      [paginationDetails.offset, paginationService.getLimit()],
+    );
 
     rep.code(StatusCodes.OK).send({
       code: StatusCodes.OK,
       status: StatusDescriptions.OK,
-      data: [...result.rows],
+      data: result.rows.map((row) => ({
+        id: row.id,
+        username: row.username,
+        email: row.email,
+        fullName: row.full_name,
+        mobile: row.mobile,
+        role: row.role,
+      })),
       pagination: {
         totalRecords: result.rowCount,
         currentPage: paginationService.getCurrentPage(),

@@ -18,8 +18,9 @@ export type User = {
   id: string;
   username: string;
   password?: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   email: string;
   mobile: string;
   role: UserRoles;
