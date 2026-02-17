@@ -7,10 +7,11 @@ import {
 } from "../utils/pagination/pagination.types.js";
 import PaginationService from "../utils/pagination/pagination.service.js";
 
-import { Book, GetBookParams } from "./books.types.js";
+import { AddBookDto, Book, GetBookParams } from "./books.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
 import { ResponseMessages } from "../enums/response-messages.js";
+import { QueryResult } from "pg";
 
 export async function addBooks(
   this: FastifyInstance,
@@ -18,7 +19,7 @@ export async function addBooks(
   rep: FastifyReply,
 ) {
   try {
-    const books: Book[] = req.body as Book[];
+    const books: AddBookDto[] = req.body as AddBookDto[];
 
     // Create parameter positions
     const parameterPositions = books
@@ -77,10 +78,11 @@ export async function getBooks(
       Number.parseInt(limit.toString()),
     );
 
-    let query = `SELECT COUNT(b.id) AS count
-                 FROM books b`;
-
-    let result = (await this.database.query(query)).rows[0];
+    let result: QueryResult<Book> | { count: number } = (
+      await this.database.query<{ count: number }>(
+        `SELECT COUNT(b.id) AS count FROM books b`,
+      )
+    ).rows[0];
 
     let paginationDetails: PaginationDetails | undefined;
     try {
@@ -90,27 +92,34 @@ export async function getBooks(
       return rep.code(400).send(error);
     }
 
-    query = `
-        SELECT b.id,
-               b.title,
-               b.author,
-               b.isbn,
-               b.published_at,
-               b.is_available,
-               b.quantity
-        FROM books b
-        OFFSET $1 LIMIT $2;
-    `;
-
-    result = await this.database.query(query, [
-      paginationDetails.offset,
-      paginationService.getLimit(),
-    ]);
+    result = await this.database.query(
+      `
+      SELECT
+        ROW_NUMBER() OVER (ORDER BY b.created_at DESC) AS id,
+        TRIM(b.title) As title,
+        TRIM(b.author) AS author,
+        TRIM(b.isbn) AS isbn,
+        b.published_at,
+        b.quantity,
+        b.is_available
+      FROM books b
+      OFFSET $1 LIMIT $2;
+    `,
+      [paginationDetails.offset, paginationService.getLimit()],
+    );
 
     const response = {
       code: StatusCodes.OK,
       status: StatusDescriptions.OK,
-      data: [...result.rows],
+      data: result.rows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        author: row.author,
+        isbn: row.isbn,
+        publicationDate: row.published_at,
+        isAvailable: row.is_available,
+        quantity: row.quantity,
+      })),
       pagination: {
         totalRecords: result.rowCount,
         currentPage: paginationService.getCurrentPage(),

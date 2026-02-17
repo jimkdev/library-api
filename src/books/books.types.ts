@@ -1,5 +1,14 @@
 export type Book = {
-  id?: string;
+  id?: string | number;
+  title: string;
+  author: string;
+  isbn: string;
+  published_at: Date;
+  quantity: number;
+  is_available: boolean;
+};
+
+export type AddBookDto = {
   title: string;
   author: string;
   isbn: string;

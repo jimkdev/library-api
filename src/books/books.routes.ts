@@ -108,12 +108,12 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string" },
+                  id: { type: "number" },
                   title: { type: "string" },
                   author: { type: "string" },
                   isbn: { type: "string" },
-                  published_at: { type: "string" },
-                  is_available: { type: "boolean" },
+                  publicationDate: { type: "string" },
+                  isAvailable: { type: "boolean" },
                   quantity: { type: "number" },
                 },
               },
