@@ -87,12 +87,6 @@ app.register(bookRoutes);
 app.register(bookLendingsRoutes);
 app.register(analyticsRoutes);
 
-app.addHook("onSend", async (req: FastifyRequest, rep: FastifyReply) => {
-  if (!rep.getHeader("Content-Type")) {
-    rep.header("Content-Type", "application/json; charset=utf-8");
-  }
-});
-
 app.setErrorHandler(function (
   error: FastifyError,
   req: FastifyRequest,
