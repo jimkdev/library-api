@@ -13,12 +13,12 @@ export async function getAnalytics(
   try {
     const analytics: Analytics = (
       await this.database.query(`
-        WITH book_lendings_metrics AS (
+        WITH book_loan_metrics AS (
           SELECT
-            COUNT(bl.id)::BIGINT AS total_book_lendings,
-            COUNT(bl.id) FILTER (WHERE bl.returned_at IS NOT NULL)::BIGINT AS total_closed_book_lendings,
-            COUNT(bl.id) FILTER (WHERE bl.returned_at IS NULL)::BIGINT AS total_open_book_lendings
-          FROM book_lendings bl
+            COUNT(bl.id)::BIGINT AS total_book_loans,
+            COUNT(bl.id) FILTER (WHERE bl.returned_at IS NOT NULL)::BIGINT AS total_closed_book_loans,
+            COUNT(bl.id) FILTER (WHERE bl.returned_at IS NULL)::BIGINT AS total_open_book_loans
+          FROM book_loans bl
         ),
         user_metrics AS (
           SELECT
@@ -32,7 +32,7 @@ export async function getAnalytics(
         )
         SELECT *
         FROM
-          book_lendings_metrics,
+          book_loan_metrics,
           user_metrics,
           book_metrics;
       `)
@@ -43,9 +43,9 @@ export async function getAnalytics(
       status: StatusDescriptions.OK,
       message: ResponseMessages.ANALYTICS_HAVE_BEEN_RETRIEVED_200,
       data: {
-        totalBookLendings: analytics["total_book_lendings"],
-        totalClosedBookLendings: analytics["total_closed_book_lendings"],
-        totalOpenBookLendings: analytics["total_open_book_lendings"],
+        totalBookLoans: analytics["total_book_loans"],
+        totalClosedBookLoans: analytics["total_closed_book_loans"],
+        totalOpenBookLoans: analytics["total_open_book_loans"],
         totalActiveUsers: analytics["total_active_users"],
         totalAvailableBooks: analytics["total_available_books"],
       },

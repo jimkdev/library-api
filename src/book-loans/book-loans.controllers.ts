@@ -7,7 +7,7 @@ import AppConfig from "../config.js";
 import {
   BookLendingDto,
   ExtendBookLendingReturnDateDto,
-} from "./book-lendings.types.js";
+} from "./book-loans.types.js";
 import { StatusCodes } from "../enums/status-codes.js";
 import { StatusDescriptions } from "../enums/status-descriptions.js";
 import { ResponseMessages } from "../enums/response-messages.js";
@@ -70,7 +70,7 @@ export async function lendBook(
       const active_book_lending_id = (
         await this.database.query(
           `
-        SELECT id FROM book_lendings
+        SELECT id FROM book_loans
         WHERE user_id = $1 AND returned_at IS NULL;
       `,
           [userId],
@@ -89,7 +89,7 @@ export async function lendBook(
         await this.database.query("BEGIN;");
         await this.database.query(
           `
-          INSERT INTO book_lendings (user_id, book_id, date_of_return) VALUES ($1, $2, $3);
+          INSERT INTO book_loans (user_id, book_id, date_of_return) VALUES ($1, $2, $3);
         `,
           [
             userId,
@@ -156,7 +156,7 @@ export async function extendReturnDate(
   try {
     await this.database.query("BEGIN;");
     const response = (await this.database.query(
-      `SELECT bl.date_of_return, date_extended FROM book_lendings bl
+      `SELECT bl.date_of_return, date_extended FROM book_loans bl
         WHERE bl.id = ${bookLendingId};`,
     )) as QueryResult<{ date_of_return: number; date_extended: boolean }>;
 
@@ -196,7 +196,7 @@ export async function extendReturnDate(
 
     await this.database.query(
       `
-        UPDATE book_lendings
+        UPDATE book_loans
         SET date_of_return = '${newDate.toISODate()}', date_extended = TRUE
         WHERE id = ${bookLendingId}`,
     );
@@ -269,7 +269,7 @@ export async function returnBook(
     let affectedRows = (
       await this.database.query(
         `
-      UPDATE book_lendings
+      UPDATE book_loans
       SET returned_at = $1
       WHERE user_id = $2 AND book_id = $3 AND returned_at IS NULL;
     `,

@@ -7,18 +7,18 @@ import {
   extendReturnDate,
   lendBook,
   returnBook,
-} from "./book-lendings.controllers.js";
+} from "./book-loans.controllers.js";
 import { checkIfUserIsActive } from "../users/users.middleware.js";
 
 export default fp(function (app: FastifyInstance, opts, done: () => void) {
-  const baseUrl = "/books/lendings";
+  const baseUrl = "/books/loans";
 
   app.route({
     url: `${baseUrl}/create`,
     method: "POST",
     schema: {
       description: "Create a book lending",
-      tags: ["book-lendings"],
+      tags: ["book-loans"],
       body: {
         type: "object",
         properties: {
@@ -36,7 +36,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     method: "POST",
     schema: {
       description: "Extend the return date",
-      tags: ["book-lendings"],
+      tags: ["book-loans"],
       body: {
         type: "object",
         properties: {
@@ -55,7 +55,7 @@ export default fp(function (app: FastifyInstance, opts, done: () => void) {
     preHandler: [checkIfUserIsActive, isAuthorized],
     schema: {
       description: "Return a lent book",
-      tags: ["book-lendings"],
+      tags: ["book-loans"],
       body: {
         type: "object",
         properties: {

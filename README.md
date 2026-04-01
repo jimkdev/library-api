@@ -101,7 +101,7 @@ Table books {
   updated_at   TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
 }
 
-Table book_lendings {
+Table book_loans {
   id             SERIAL    [PRIMARY KEY]
   user_id        UUID      [NOT NULL]
   book_id        UUID      [NOT NULL]
@@ -122,8 +122,8 @@ Table refresh_tokens {
   updated_at TIMESTAMP    [NOT NULL, DEFAULT: 'CURRENT_TIMESTAMP']
 }
 
-Ref: book_lendings.user_id > users.id
-Ref: book_lendings.book_id - books.id
+Ref: book_loans.user_id > users.id
+Ref: book_loans.book_id - books.id
 ```
 
 ### ER Diagram

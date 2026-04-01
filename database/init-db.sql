@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS books
     updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS book_lendings
+CREATE TABLE IF NOT EXISTS book_loans
 (
     id             SERIAL PRIMARY KEY,
     user_id        UUID      NOT NULL REFERENCES users (id),

@@ -8,7 +8,7 @@ import AppConfig from "./config.js";
 import userRoutes from "./users/users.routes.js";
 import bookRoutes from "./books/books.routes.js";
 import database from "./database/pool.js";
-import bookLendingsRoutes from "./book-lendings/book-lendings.routes.js";
+import bookLoansRoutes from "./book-loans/book-loans.routes.js";
 import userDecorators from "./users/users.decorators.js";
 import analyticsRoutes from "./analytics/analytics.routes.js";
 
@@ -50,7 +50,7 @@ await app.register(import("@fastify/swagger"), {
     tags: [
       { name: "users", description: "User related endpoints" },
       { name: "books", description: "Book related endpoints" },
-      { name: "book-lendings", description: "Book lendings related endpoints" },
+      { name: "book-loans", description: "Book loans related endpoints" },
       { name: "analytics", description: "Analytics related endpoints" },
     ],
   },
@@ -84,7 +84,7 @@ app.register(database);
 app.register(userDecorators);
 app.register(userRoutes);
 app.register(bookRoutes);
-app.register(bookLendingsRoutes);
+app.register(bookLoansRoutes);
 app.register(analyticsRoutes);
 
 app.setErrorHandler(function (
