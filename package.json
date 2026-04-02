@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "node --loader=ts-node/esm --watch src/app.ts",
+    "dev": "tsx watch ./src/app.ts --tsconfig ./tsconfig.json",
     "build": "npx tsc -p tsconfig.json",
     "start": "node dist/app.js",
     "format": "npx prettier src/ --write",
@@ -28,7 +28,6 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
     "prettier": "3.4.2",
-    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0"
