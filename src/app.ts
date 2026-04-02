@@ -11,6 +11,8 @@ import database from "./database/pool.js";
 import bookLoansRoutes from "./book-loans/book-loans.routes.js";
 import userDecorators from "./users/users.decorators.js";
 import analyticsRoutes from "./analytics/analytics.routes.js";
+import { StatusCodes } from "./enums/status-codes.js";
+import { StatusDescriptions } from "./enums/status-descriptions.js";
 
 dotenv.config();
 
@@ -78,6 +80,13 @@ await app.register(import("@fastify/swagger-ui"), {
   transformSpecificationClone: true,
 });
 
+app.get("/", function (req: FastifyRequest, rep: FastifyReply) {
+  rep.code(StatusCodes.OK).send({
+    code: StatusCodes.OK,
+    status: StatusDescriptions.OK,
+    message: "API is running!",
+  });
+});
 app.register(cors);
 app.register(cookie);
 app.register(database);
