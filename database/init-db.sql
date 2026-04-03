@@ -59,3 +59,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- CHECKS --
+ALTER TABLE books
+ADD CONSTRAINT ck_books_quantity CHECK (quantity >= 0);
