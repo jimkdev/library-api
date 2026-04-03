@@ -17,6 +17,12 @@ CREATE TABLE IF NOT EXISTS users
     updated_at TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS book_categories
+(
+    id            UUID PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS books
 (
     id           UUID PRIMARY KEY,
@@ -26,6 +32,7 @@ CREATE TABLE IF NOT EXISTS books
     published_at DATE,
     is_available BOOLEAN      NOT NULL DEFAULT FALSE,
     quantity     INT          NOT NULL DEFAULT 0,
+    category_id UUID NOT NULL REFERENCES book_categories (id),
     created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
